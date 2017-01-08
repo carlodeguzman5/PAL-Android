@@ -1,0 +1,234 @@
+<resources>
+    <string name="app_name">PAL Evaluations</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="title_activity_main">Evaluations</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string-array name="aircraft_codes">
+        <item>Q300</item>
+        <item>Q400</item>
+        <item>A320</item>
+        <item>A330</item>
+    </string-array>
+    <string-array name="employee_status">
+        <item>Regular</item>
+        <item>Trainee/SLE</item>
+        <item>Probationary</item>
+    </string-array>
+    <string-array name="evaluation_page_1">
+        <item>Company ID</item>
+        <item>Competency Card</item>
+        <item>Safety Directives</item>
+        <item>Equipment Checklist</item>
+        <item>CAAP License / CAAP Med Certificate</item>
+        <item>Flashlight with Spare Batteries</item>
+        <item>Company Medical Certificate</item>
+        <item>Passport &amp; Visa</item>
+        <item>Flight Log Book</item>
+        <item>Quick Reference Folder</item>
+        <item>RON Clothes / Spare Uniform</item>
+    </string-array>
+    <string-array name="evaluation_page_2">
+        <item>Hair</item>
+        <item>Skin</item>
+        <item>Uniform</item>
+        <item>Baggage</item>
+        <item>Hosiery / Socks</item>
+        <item>Jewellery / Wristwatch</item>
+        <item>Nails</item>
+        <item>Personal Hygiene</item>
+        <item>Weight</item>
+    </string-array>
+    <string-array name="evaluation_page_3">
+        <item>Reported on time</item>
+        <item>Introduced / Acknowledged crew members</item>
+        <item>Participated in L1\'s safety pre-flight briefing</item>
+        <item>Participated in L1\'s service pre-flight briefing</item>
+        <item>Decorum &amp; approachability at the airport</item>
+        <item>Timely arrival at boarding gate</item>
+    </string-array>
+    <string-array name="evaluation_page_4">
+        <item>Stowed Safety Directives &amp; Flashlights</item>
+        <item>Checked presence &amp; conditions of the following</item>
+        <item>Emergency Equipment</item>
+        <item>Jumpseat</item>
+        <item>Doors / Exits</item>
+        <item>Passenger Service Unit</item>
+        <item>Seat Pocket Amenities</item>
+        <item>Passenger Lifevest / Seatbelt</item>
+        <item>Communication SystemsUnit</item>
+        <item>Galley Equipment</item>
+        <item>Lavatory Equipment</item>
+        <item>Reported cabin discrepancies</item>
+        <item>Performed security check</item>
+        <item>Ensured completeness of galley supplies / equipment</item>
+        <item>Ensured meal / snack provisions are complete tally with checklist</item>
+        <item>Prepared passenger amenities &amp; needs / timely preparation</item>
+        <item>Checked lavatory &amp; completeness of its supplies / equipment</item>
+        <item>Checked grooming in preparation for boarding</item>
+        <item>Conducted final cabin check prior to boarding</item>
+        <item>Coordinated with L1 for special handling &amp; final load if not relayed </item>
+    </string-array>
+
+    <string-array name="evaluation_page_5">
+        <item>Boarding stations</item>
+        <item>Welcomed, greeted, properly addressed passengers</item>
+        <item>Assisted &amp; monitored in cabin baggage &amp; stowage</item>
+        <item>Assisted Special Handling Passengers </item>
+        <item>Unobstructed aisle / exits</item>
+        <item>Stowed COB in the OHB or under the seats</item>
+        <item>Checked boarding pass &amp; conducted headcount</item>
+        <item>Distributed infant’s lifevest</item>
+        <item>Briefed exit row passengers</item>
+        <item>Obtained close door clearance from L1</item>
+    </string-array>
+
+    <string-array name="evaluation_page_6">
+        <item>Armed &amp; crosschecked doors</item>
+        <item>Reported close door to L1</item>
+        <item>Unobstructed aisle / exits </item>
+        <item>Secured galley compartments / trolleys / galley curtain</item>
+        <item>Safety demonstration (position &amp; procedure) </item>
+        <item>Lavatories secured &amp; unoccupied </item>
+        <item>Switched off galley equipment</item>
+        <item>Seatbelt / No Smoking Compliance </item>
+        <item>PED compliance</item>
+        <item>Seat backs upright / armrests down</item>
+        <item>Window shades open / stowed curtains</item>
+        <item>Stowed tray tables</item>
+        <item>Properly stowed COBs &amp; OHB close</item>
+        <item>Observed surface movement</item>
+        <item>Take-off stations</item>
+    </string-array>
+
+    <string-array name="evaluation_page_7">
+        <item>Checked passenger welfare after seatbelt sign off</item>
+        <item>Changed into smock / vest </item>
+        <item>Offered inflight amenities pleasantly </item>
+        <item>Maintained cabin presence</item>
+        <item>Galley &amp; cabin - systematic &amp; orderly preparation</item>
+        <item>Meal service was timely &amp; on standard service flow</item>
+        <item>Meal service / offered refills &amp; after meal drinks</item>
+        <item>Galley &amp; cabin are clean &amp; tidy after meal service</item>
+        <item>DFS / IFS / iPADs / iNAiR</item>
+        <item>Lavatories</item>
+        <item>Monitored lavatory for security items</item>
+        <item>Ensured passenger compliance to safety regulations</item>
+        <item>Complied with safety regulations &amp; turbulence guidelines</item>
+        <item>Monitored co-crew &amp; flight crew welfare</item>
+        <item>Observed fire prevention procedures</item>
+    </string-array>
+
+    <string-array name="evaluation_page_8">
+        <item>Collected &amp; returned all service items</item>
+        <item>Ensured items for rental are retrieved accounted for</item>
+        <item>Ensured proper accomplishment of checklists</item>
+        <item>Unobstructed aisle / exits</item>
+        <item>Secured galley compartments &amp; equipment</item>
+        <item>Lavatory secured &amp; unoccupied</item>
+        <item>Galley equipment</item>
+        <item>Seatbelt / no smoking compliance</item>
+        <item>Seat backs upright / armrests down</item>
+        <item>Opened window shades / stowed curtains</item>
+        <item>Stowed tray tables</item>
+        <item>Ensured carry-on baggage are properly stowed</item>
+        <item>Ensured overhead bins are properly closed</item>
+        <item>Changed back to jacket / on grooming standards</item>
+        <item>Landing stations (seatbelt &amp; shoulder harness)</item>
+    </string-array>
+
+    <string-array name="evaluation_page_9">
+        <item>Trolleys sealed &amp; padlocked bonded items </item>
+        <item>Observed surface movement</item>
+        <item>Manned doors</item>
+        <item>Checked outside condition</item>
+        <item>Disarmed &amp; crosschecked doors correct door procedures</item>
+        <item>Obtained open door clearance (L1)</item>
+        <item>Checked outside condition</item>
+        <item>Continuously ensured ramp area is safe for passengers deplaning</item>
+        <item>Deplaning station</item>
+        <item>Bid passengers well during deplaning / addressed passengers properly</item>
+        <item>Assisted &amp; passengers with their baggage </item>
+        <item>Properly accomplished catering documents / endorsed catering supplies</item>
+        <item>Retrieved &amp; stowed infant’s lifevest</item>
+        <item>Performed security check</item>
+    </string-array>
+
+    <string-array name="evaluation_page_10">
+        <item>PASSENGER HANDLING</item>
+            <item>Passenger interaction</item>
+            <item>Passenger handling</item>
+            <item>Passenger calls</item>
+            <item>Observed HUSH campaign throughout entire duty</item>
+        <item>INTERPERSONAL RELATIONSHIP TO PEERS</item>
+            <item>Receptive to constructive criticism</item>
+            <item>Crew interaction</item>
+            <item>Crew coordination</item>
+            <item>Teamwork</item>
+        <item>IMPACT</item>
+            <item>Projection in the cabin</item>
+            <item>Appropriate crew behaviour</item>
+            <item>Approachable &amp; willing to assist passengers</item>
+            <item>Maintained positive attitude/motivated despite adverse conditions</item>
+        <item>COST EFFECTIVENESS</item>
+            <item>Conserved / maximized the use of available resources / equipment</item>
+            <item>Handled aircraft equipment &amp; supplies properly &amp; carefully</item>
+        <item>PROFESSIONAL INTEGRITY</item>
+            <item>Displayed accountability to errors</item>
+            <item>Reported critical incidents</item>
+            <item>Returned left behind items / company supplies, etc.</item>
+    </string-array>
+
+    <string-array name="evaluation_page_11">
+        <item>Doors &amp; evacuation equipment</item>
+        <item>&amp;</item>
+            <item>Pre-flight</item>
+            <item>Operation</item>
+            <item>Precaution</item>
+            <item>Equipment Plotting</item>
+        <item>EMERGENCY PROCEDURES</item>
+            <item>Unplanned Terrain</item>
+            <item>Unplanned Water</item>
+            <item>Planned Terrain</item>
+            <item>Planned Water</item>
+            <item>Crew Communication</item>
+        <item>MISCELLANEOUS</item>
+            <item>Policies &amp; Procedures</item>
+            <item>Safety Procedures</item>
+            <item>Security</item>
+            <item>First Aid</item>
+            <item>Dangerous Goods</item>
+            <item>Conditions of Carriage</item>
+    </string-array>
+
+    <string-array name="dimensions">
+        <item>Cabin Crew Equipment</item>
+        <item>Grooming</item>
+        <item>Preflight Preparation</item>
+        <item>Aircraft Boarding </item>
+        <item>Passenger Boarding</item>
+        <item>Doors Closed</item>
+        <item>After Take Off Duties</item>
+        <item>Before Landing Duties</item>
+        <item>After Landing Duties </item>
+        <item>Personal Effectiveness </item>
+        <item>Safety Knowledge </item>
+        <item>Service Knowledge</item>
+    </string-array>
+
+    <string name="title_activity_evaluation">Inflight Performance Evaluation</string>
+</resources>
+
+

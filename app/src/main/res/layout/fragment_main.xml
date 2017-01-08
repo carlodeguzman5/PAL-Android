@@ -1,0 +1,101 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="org.evaluation.pal.palcrewevaluation.MainActivity$PlaceholderFragment">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/fullNameText"
+        android:layout_alignParentStart="true"
+        android:hint="Last, First, Middle"
+        android:layout_alignEnd="@+id/radioGroup"
+        android:padding="8dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/idNumberText"
+        android:layout_below="@+id/fullNameText"
+        android:layout_alignParentStart="true"
+        android:hint="ID Number"
+        android:layout_gravity="left"
+        android:phoneNumber="true"
+        android:padding="8dp"
+        android:layout_toStartOf="@+id/employeeStatusLabel" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/aircraftSpinner"
+        android:spinnerMode="dropdown"
+        android:padding="8dp"
+        android:layout_below="@+id/empStatusSpinner"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="97dp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/radioGroup"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:layout_below="@+id/checkLabel"
+        android:layout_alignParentStart="true">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Proficiency"
+            android:id="@+id/proficiencyRadio"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Competency"
+            android:id="@+id/competencyRadio"
+            android:layout_gravity="right" />
+
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type of Check:"
+        android:id="@+id/checkLabel"
+        android:layout_below="@+id/acRegistryText"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/acRegistryText"
+        android:layout_below="@+id/aircraftSpinner"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:hint="A/C Registry" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/empStatusSpinner"
+        android:layout_alignTop="@+id/idNumberText"
+        android:layout_alignEnd="@+id/fullNameText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status:"
+        android:id="@+id/employeeStatusLabel"
+        android:padding="8dp"
+        android:layout_alignBottom="@+id/idNumberText"
+        android:layout_toStartOf="@+id/empStatusSpinner" />
+
+</RelativeLayout>
