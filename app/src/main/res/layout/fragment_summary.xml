@@ -1,0 +1,95 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.evaluation.pal.palcrewevaluation.SummaryFragment"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:orientation="horizontal">
+
+        <TextView
+            android:text="Safety"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/safetyLabel"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:layout_weight="1.0"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:text="Service"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/serviceLabel"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:layout_weight="1.0"
+            android:textAlignment="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/serviceScore"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_weight="1.0"
+            android:textAlignment="center"
+            tools:text="0" />
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/safetyScore"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_weight="1.0"
+            android:textAlignment="center"
+            tools:text="0" />
+
+    </LinearLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background='#000000'
+    android:padding="8dp"
+    android:orientation="horizontal">
+
+    <com.github.gcacace.signaturepad.views.SignaturePad
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/signature_pad_1"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_weight="1.0"
+        android:background="#FFFFFF"
+        android:layout_margin="8dp"
+        app:penColor="@android:color/black"
+        />
+
+    <com.github.gcacace.signaturepad.views.SignaturePad
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/signature_pad_2"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_weight="1.0"
+        android:background="#FFFFFF"
+        android:layout_margin="8dp"
+        app:penColor="@android:color/black"
+        />
+</LinearLayout>
+
+
+
+</LinearLayout>
