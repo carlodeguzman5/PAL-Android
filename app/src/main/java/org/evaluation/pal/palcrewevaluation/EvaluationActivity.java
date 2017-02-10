@@ -10,6 +10,8 @@
     import android.support.v4.app.FragmentPagerAdapter;
     import android.support.v4.view.ViewPager;
     import android.os.Bundle;
+    import android.text.Editable;
+    import android.text.TextWatcher;
     import android.view.Gravity;
     import android.view.LayoutInflater;
     import android.view.Menu;
@@ -24,8 +26,11 @@
     import android.widget.RelativeLayout;
     import android.widget.ScrollView;
     import android.widget.Spinner;
+    import android.widget.TextClock;
     import android.widget.TextView;
     import android.widget.Toast;
+
+    import com.github.gcacace.signaturepad.views.SignaturePad;
 
     import org.w3c.dom.Text;
 
@@ -51,7 +56,13 @@
         private static Map<String, Integer> scoreList;
         private static Map<String, String> scoreCategoryMapping;
         private static int safetyScore, serviceScore;
-        private static TextView safetyScoreText, serviceScoreText;
+        private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel;
+        private static SignaturePad empSignaturePad, raterSignaturePad;
+
+        /*Employee Details*/
+        private static EditText employeeName, idNumber, date, acRegistry, flightNum, sector, sla, raterName;
+        private static RadioGroup checkType;
+
         private static boolean debug = false;
 
         @Override
@@ -183,6 +194,50 @@
                         aircraftSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         aircraftSpinner.setAdapter(aircraftSpinnerAdapter);
 
+                        employeeName = (EditText) rootView.findViewById(R.id.fullNameText);
+                        idNumber = (EditText) rootView.findViewById(R.id.idNumberText);
+                        date = (EditText) rootView.findViewById(R.id.dateText);
+                        acRegistry = (EditText) rootView.findViewById(R.id.acRegistryText);
+                        flightNum = (EditText) rootView.findViewById(R.id.flightNumText);
+                        sector = (EditText) rootView.findViewById(R.id.sectorText);
+                        sla = (EditText) rootView.findViewById(R.id.slaText);
+                        raterName = (EditText) rootView.findViewById(R.id.raterText);
+                        checkType = (RadioGroup) rootView.findViewById(R.id.checkTypeRadioGroup);
+
+                        employeeName.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                empNameLabel.setText(s);
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+
+                            }
+                        });
+
+                        raterName.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                raterNameLabel.setText(s);
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+
+                            }
+                        });
+
                         break;
                     case 2:
                         rootView = layoutList.get(0);
@@ -224,6 +279,14 @@
                         rootView = inflater.inflate(R.layout.fragment_summary, container, false);
                         serviceScoreText = (TextView) rootView.findViewById(R.id.serviceScore);
                         safetyScoreText = (TextView) rootView.findViewById(R.id.safetyScore);
+                        empNameLabel = (TextView) rootView.findViewById(R.id.employeeNameLabel);
+                        raterNameLabel = (TextView) rootView.findViewById(R.id.raterNameLabel);
+                        empSignaturePad = (SignaturePad) rootView.findViewById(R.id.signature_pad_1);
+                        raterSignaturePad = (SignaturePad) rootView.findViewById(R.id.signature_pad_2);
+
+                        serviceScoreText.setText("0");
+                        safetyScoreText.setText("0");
+
                         break;
                 }
                 return rootView;
@@ -271,6 +334,7 @@
                 }
                 else{
                     EditText rowEditText = new EditText(context);
+                    rowEditText.setLayoutParams(params);
                     rowLayout.addView(rowEditText);
                 }
 
@@ -401,7 +465,7 @@
             int score = 0;
             for(Map.Entry<String, Integer> entry :  scoreList.entrySet()){
                 String category = scoreCategoryMapping.get(entry.getKey());
-                if(category.trim().equalsIgnoreCase("Service"))
+                if(category.trim().equalsIgnoreCase("Service") || category.trim().equalsIgnoreCase("Text"))
                     score += entry.getValue();
             }
             serviceScore = score;

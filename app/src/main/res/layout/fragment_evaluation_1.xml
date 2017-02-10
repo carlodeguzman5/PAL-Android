@@ -1,215 +1,209 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.evaluation.pal.palcrewevaluation.MainActivity$PlaceholderFragment">
 
-    <Spinner
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/aircraftSpinner"
-        android:spinnerMode="dropdown"
-        android:padding="8dp"
-        android:layout_alignBottom="@+id/acRegistryText"
-        android:layout_alignEnd="@+id/empStatusSpinner"
-        android:layout_below="@+id/dateText" />
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical">
 
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/empStatusSpinner"
-        android:layout_alignTop="@+id/employeeStatusLabel"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/employeeStatusLabel" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Status:"
-        android:id="@+id/employeeStatusLabel"
-        android:padding="8dp"
-        android:layout_below="@+id/fullNameText"
-        android:layout_toStartOf="@+id/empStatusSpinner"
-        android:layout_above="@+id/dateText" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="date"
-        android:ems="10"
-        android:id="@+id/dateText"
-        android:layout_below="@+id/idNumberText"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/aircraftSpinner"
-        android:padding="8dp" />
-
-    <TextView
-        android:text="Flight Number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/flightNumberLabel"
-        android:layout_below="@+id/acRegistryText"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="Sector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/sectorLabel"
-        android:layout_weight="0.32"
-        android:layout_below="@+id/flightNumberText"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/flightNumberLabel" />
-
-    <TextView
+        <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Employee and Aircraft Information"
         android:id="@+id/personalInfoLabel"
         android:paddingBottom="8dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_alignParentEnd="true" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
-    <TextView
-        android:text="SLA"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/slaLabel"
-        android:layout_below="@+id/sectorText"
-        android:layout_alignEnd="@+id/checkLabel"
-        android:layout_alignStart="@+id/slaText" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/slaText"
-        android:layout_below="@+id/slaLabel"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:singleLine="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Type of Check:"
-        android:id="@+id/checkLabel"
-        android:layout_below="@+id/slaText"
-        android:layout_alignParentStart="true" />
-
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/radioGroup"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:weightSum="1"
-        android:layout_below="@+id/checkLabel"
-        android:layout_alignParentStart="true">
-
-        <RadioButton
+        <TextView
+            android:text="Full Name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Proficiency"
-            android:id="@+id/proficiencyRadio"
-            android:layout_weight="0.32" />
+            android:id="@+id/nameLabel" />
 
-        <RadioButton
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/fullNameText"
+            android:hint="Last, First, Middle"
+            android:padding="8dp"/>
+
+        <TextView
+            android:text="ID Number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Competency"
-            android:id="@+id/competencyRadio"
-            android:layout_gravity="right"
-            android:layout_weight="0.29" />
+            android:id="@+id/idNumberLabel"/>
 
-    </RadioGroup>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1.0">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/fullNameText"
-        android:hint="Last, First, Middle"
-        android:padding="8dp"
-        android:layout_below="@+id/nameLabel"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/idNumberText"
+                android:layout_gravity="start"
+                android:inputType="number"
+                android:padding="8dp"
+                android:maxLines="1"
+                android:layout_weight="0.4"/>
 
-    <TextView
-        android:text="Full Name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/nameLabel"
-        android:layout_below="@+id/personalInfoLabel"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/idNumberLabel" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Status:"
+                android:id="@+id/employeeStatusLabel"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:layout_weight="0.15"/>
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/acRegistryText"
-        android:layout_below="@+id/acRegistryLabel"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/aircraftSpinner"
-        android:singleLine="true" />
+            <Spinner
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/empStatusSpinner"
+                android:layout_weight="0.45"/>
 
-    <TextView
-        android:text="AC Registry"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/acRegistryLabel"
-        android:layout_below="@+id/dateText"
-        android:layout_alignParentStart="true" />
+        </LinearLayout>
 
-    <TextView
-        android:text="ID Number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/fullNameText"
-        android:id="@+id/idNumberLabel"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/acRegistryLabel" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:id="@+id/dateLabel"
+            android:padding="8dp" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/idNumberText"
-        android:layout_gravity="left"
-        android:phoneNumber="true"
-        android:padding="8dp"
-        android:layout_below="@+id/idNumberLabel"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/employeeStatusLabel"
-        android:singleLine="true" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:ems="10"
+            android:id="@+id/dateText"
+            android:padding="8dp" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/flightNumberText"
-        android:layout_below="@+id/flightNumberLabel"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:singleLine="true" />
+        <TextView
+            android:text="AC Registry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/acRegistryLabel"/>
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/sectorText"
-        android:layout_below="@+id/sectorLabel"
-        android:layout_alignParentStart="true"
-        android:singleLine="true"
-        android:layout_alignParentEnd="true" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-</RelativeLayout>
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/acRegistryText"
+                android:maxLines="1"
+                android:layout_weight="0.8"/>
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/aircraftSpinner"
+                android:spinnerMode="dropdown"
+                android:padding="8dp"
+                android:layout_weight="0.2"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:text="Flight Number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/flightNumberLabel" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/flightNumText"
+            android:maxLines="1" />
+
+        <TextView
+            android:text="Sector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/sectorLabel"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/sectorText"
+            android:maxLines="1"/>
+
+        <TextView
+            android:text="SLA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/slaLabel"
+            android:layout_below="@+id/sectorText"
+            android:layout_alignEnd="@+id/checkLabel"
+            android:layout_alignStart="@+id/slaText" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/slaText"
+            android:maxLines="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rater"
+            android:id="@+id/raterNameLabel" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/raterText"/>
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkTypeRadioGroup"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:weightSum="1">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Proficiency"
+                android:id="@+id/proficiencyRadio"
+                android:layout_weight="0.5" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Competency"
+                android:id="@+id/competencyRadio"
+                android:layout_weight="0.5" />
+
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Type of Check:"
+            android:id="@+id/checkLabel"/>
+
+    </LinearLayout>
+</ScrollView>

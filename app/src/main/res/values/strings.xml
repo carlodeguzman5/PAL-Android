@@ -213,9 +213,9 @@
     </string-array>
 
     <string-array name="evaluation_page_12">
-        <item>|Text|01</item>
-        <item>|Text|01</item>
-        <item>|Text|01</item>
+        <item>1.|Text|01</item>
+        <item>2.|Text|01</item>
+        <item>3.|Text|01</item>
     </string-array>
 
     <string-array name="dimensions">
