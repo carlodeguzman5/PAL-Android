@@ -54,9 +54,10 @@
         private ViewPager mViewPager;
         private static List<View> layoutList;
         private static Map<String, Integer> scoreList;
+        private static Map<String, Integer> maxScoreList;
         private static Map<String, String> scoreCategoryMapping;
-        private static int safetyScore, serviceScore;
-        private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel;
+        private static int safetyScore, serviceScore, totalQuestionsCount;
+        private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel, safetyMaxScoreText, serviceMaxScoreText;
         private static SignaturePad empSignaturePad, raterSignaturePad;
 
         /*Employee Details*/
@@ -162,6 +163,7 @@
 
                 layoutList = new ArrayList<>();
                 scoreList = new HashMap<>();
+                maxScoreList = new HashMap<>();
                 scoreCategoryMapping = new HashMap<>();
 
                 for(int i = 0; i < 12; i++){
@@ -277,8 +279,12 @@
                         break;
                     case 14:
                         rootView = inflater.inflate(R.layout.fragment_summary, container, false);
+
                         serviceScoreText = (TextView) rootView.findViewById(R.id.serviceScore);
                         safetyScoreText = (TextView) rootView.findViewById(R.id.safetyScore);
+                        serviceMaxScoreText = (TextView) rootView.findViewById(R.id.serviceScoreHPS);
+                        safetyMaxScoreText = (TextView) rootView.findViewById(R.id.safetyScoreHPS);
+
                         empNameLabel = (TextView) rootView.findViewById(R.id.employeeNameLabel);
                         raterNameLabel = (TextView) rootView.findViewById(R.id.raterNameLabel);
                         empSignaturePad = (SignaturePad) rootView.findViewById(R.id.signature_pad_1);
@@ -286,6 +292,8 @@
 
                         serviceScoreText.setText("0");
                         safetyScoreText.setText("0");
+                        serviceMaxScoreText.setText("0");
+                        safetyMaxScoreText.setText("0");
 
                         break;
                 }
@@ -352,6 +360,7 @@
                     //rowRadioGroup.setLayoutParams(params);
 
                     scoreCategoryMapping.put(rowLabel, rowType);
+
                 }
 
                 rowLayout.addView(rowRadioGroup);
@@ -375,23 +384,25 @@
 
         public static class ScoreClickListener implements View.OnClickListener{
             String rowName;
-            int score;
+            int score, maxScore;
             Context context;
-            public ScoreClickListener(String rowName, int score, Context context){
+            public ScoreClickListener(String rowName, int score, int maxScore, Context context){
                 this.rowName = rowName;
                 this.score = score;
+                this.maxScore = maxScore;
                 this.context = context;
             }
 
             @Override
             public void onClick(View v) {
                 scoreList.put(rowName, score);
+                maxScoreList.put(rowName, maxScore);
                 updateServiceScore(context);
                 updateSafetyScore(context);
             }
         }
 
-        private static RadioGroup generateRadioGroup(final Context context, String type, String rowName){
+        private static RadioGroup generateRadioGroup(final Context context, String type, final String rowName){
             RadioGroup rowRadioGroup = new RadioGroup(context);
 
             rowRadioGroup.setOrientation(RadioGroup.HORIZONTAL);
@@ -400,11 +411,11 @@
             if(type.equals("01")){
                 RadioButton zeroButton = new RadioButton(context);
                 zeroButton.setText("0");
-                zeroButton.setOnClickListener(new ScoreClickListener(rowName, 0, context));
+                zeroButton.setOnClickListener(new ScoreClickListener(rowName, 0, 1, context));
 
                 RadioButton oneButton = new RadioButton(context);
                 oneButton.setText("1");
-                oneButton.setOnClickListener(new ScoreClickListener(rowName, 1, context));
+                oneButton.setOnClickListener(new ScoreClickListener(rowName, 1, 1, context));
 
                 rowRadioGroup.addView(zeroButton);
                 rowRadioGroup.addView(oneButton);
@@ -412,19 +423,19 @@
             else if(type.equals("0123")){
                 RadioButton zeroButton = new RadioButton(context);
                 zeroButton.setText("0");
-                zeroButton.setOnClickListener(new ScoreClickListener(rowName, 0, context));
+                zeroButton.setOnClickListener(new ScoreClickListener(rowName, 0, 3, context));
 
                 RadioButton oneButton = new RadioButton(context);
                 oneButton.setText("1");
-                oneButton.setOnClickListener(new ScoreClickListener(rowName, 1, context));
+                oneButton.setOnClickListener(new ScoreClickListener(rowName, 1, 3, context));
 
                 RadioButton twoButton = new RadioButton(context);
                 twoButton.setText("2");
-                twoButton.setOnClickListener(new ScoreClickListener(rowName, 2, context));
+                twoButton.setOnClickListener(new ScoreClickListener(rowName, 2, 3, context));
 
                 RadioButton threeButton = new RadioButton(context);
                 threeButton.setText("3");
-                threeButton.setOnClickListener(new ScoreClickListener(rowName, 3, context));
+                threeButton.setOnClickListener(new ScoreClickListener(rowName, 3, 3, context));
 
                 rowRadioGroup.addView(zeroButton);
                 rowRadioGroup.addView(oneButton);
@@ -434,35 +445,28 @@
             else{
                 RadioButton oButton = new RadioButton(context);
                 oButton.setText("O");
-                oButton.setOnClickListener(new ScoreClickListener(rowName, 1, context));
+                oButton.setOnClickListener(new ScoreClickListener(rowName, 1, 1, context));
 
                 RadioButton bButton = new RadioButton(context);
                 bButton.setText("B");
-                bButton.setOnClickListener(new ScoreClickListener(rowName, 0, context));
+                bButton.setOnClickListener(new ScoreClickListener(rowName, 0, 1, context));
 
                 RadioButton naButton = new RadioButton(context);
                 naButton.setText("N/A");
-                naButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        naScore();
-                    }
-                });
+                naButton.setOnClickListener(new ScoreClickListener(rowName, 0, 0, context));
 
                 rowRadioGroup.addView(oButton);
                 rowRadioGroup.addView(bButton);
                 rowRadioGroup.addView(naButton);
             }
 
+            totalQuestionsCount++;
             return rowRadioGroup;
-        }
-
-        private static void naScore(){
-
         }
 
         private static void updateServiceScore(Context context){
             int score = 0;
+            int maxScore = 0;
             for(Map.Entry<String, Integer> entry :  scoreList.entrySet()){
                 String category = scoreCategoryMapping.get(entry.getKey());
                 if(category.trim().equalsIgnoreCase("Service") || category.trim().equalsIgnoreCase("Text"))
@@ -472,12 +476,21 @@
             serviceScoreText.setText(String.valueOf(serviceScore));
 
 
+            for(Map.Entry<String, Integer> entry :  maxScoreList.entrySet()){
+                String category = scoreCategoryMapping.get(entry.getKey());
+                if(category.trim().equalsIgnoreCase("Service") || category.trim().equalsIgnoreCase("Text"))
+                    maxScore += entry.getValue();
+            }
+            serviceMaxScoreText.setText(String.valueOf(maxScore));
+
+
             if(debug)
                 Toast.makeText(context, String.valueOf(score), Toast.LENGTH_SHORT).show();
         }
 
         private static void updateSafetyScore (Context context){
             int score = 0;
+            int maxScore = 0;
             for(Map.Entry<String, Integer> entry :  scoreList.entrySet()){
                 String category = scoreCategoryMapping.get(entry.getKey());
                 if(category.trim().equalsIgnoreCase("Safety"))
@@ -486,6 +499,14 @@
 
             safetyScore = score;
             safetyScoreText.setText(String.valueOf(safetyScore));
+
+            for(Map.Entry<String, Integer> entry :  maxScoreList.entrySet()){
+                String category = scoreCategoryMapping.get(entry.getKey());
+                if(category.trim().equalsIgnoreCase("Safety"))
+                    maxScore += entry.getValue();
+            }
+
+            safetyMaxScoreText.setText(String.valueOf(maxScore));
 
             if(debug)
                 Toast.makeText(context, String.valueOf(score), Toast.LENGTH_LONG).show();
