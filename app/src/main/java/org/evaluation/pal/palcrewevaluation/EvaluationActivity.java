@@ -34,6 +34,7 @@
 
     import org.w3c.dom.Text;
 
+    import java.text.DecimalFormat;
     import java.util.ArrayList;
     import java.util.Arrays;
     import java.util.HashMap;
@@ -57,7 +58,7 @@
         private static Map<String, Integer> maxScoreList;
         private static Map<String, String> scoreCategoryMapping;
         private static int safetyScore, serviceScore, totalQuestionsCount;
-        private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel, safetyMaxScoreText, serviceMaxScoreText;
+        private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel, safetyMaxScoreText, serviceMaxScoreText, finalGradeText, safetyRawText, serviceRawText;
         private static SignaturePad empSignaturePad, raterSignaturePad;
 
         /*Employee Details*/
@@ -206,6 +207,18 @@
                         raterName = (EditText) rootView.findViewById(R.id.raterText);
                         checkType = (RadioGroup) rootView.findViewById(R.id.checkTypeRadioGroup);
 
+                        for(int i = 0; i < checkType.getChildCount(); i++){
+                            checkType.getChildAt(i).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    updateGradeTexts();
+                                }
+                            });
+                        }
+
+
+
+
                         employeeName.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -285,6 +298,10 @@
                         serviceMaxScoreText = (TextView) rootView.findViewById(R.id.serviceScoreHPS);
                         safetyMaxScoreText = (TextView) rootView.findViewById(R.id.safetyScoreHPS);
 
+                        serviceRawText = (TextView) rootView.findViewById(R.id.rawServiceGradeText);
+                        safetyRawText = (TextView) rootView.findViewById(R.id.rawSafetyGradeText);
+                        finalGradeText = (TextView) rootView.findViewById(R.id.finalGradeText);
+
                         empNameLabel = (TextView) rootView.findViewById(R.id.employeeNameLabel);
                         raterNameLabel = (TextView) rootView.findViewById(R.id.raterNameLabel);
                         empSignaturePad = (SignaturePad) rootView.findViewById(R.id.signature_pad_1);
@@ -294,6 +311,10 @@
                         safetyScoreText.setText("0");
                         serviceMaxScoreText.setText("0");
                         safetyMaxScoreText.setText("0");
+
+                        serviceRawText.setText("0%");
+                        safetyRawText.setText("0%");
+                        finalGradeText.setText("0%");
 
                         break;
                 }
@@ -482,6 +503,7 @@
                     maxScore += entry.getValue();
             }
             serviceMaxScoreText.setText(String.valueOf(maxScore));
+            updateGradeTexts();
 
 
             if(debug)
@@ -508,10 +530,60 @@
 
             safetyMaxScoreText.setText(String.valueOf(maxScore));
 
+            updateGradeTexts();
+
             if(debug)
                 Toast.makeText(context, String.valueOf(score), Toast.LENGTH_LONG).show();
         }
 
+        private static double getSafetyRawGrade(){
+            if (Double.parseDouble(safetyMaxScoreText.getText().toString()) == 0)
+                return 0;
+
+            return safetyScore / Double.parseDouble(safetyMaxScoreText.getText().toString());
+        }
+
+        private static double getServiceRawGrade(){
+            if (Double.parseDouble(serviceMaxScoreText.getText().toString()) == 0)
+                return 0;
+
+            return serviceScore / Double.parseDouble(serviceMaxScoreText.getText().toString());
+        }
+
+        private static double getGrade(int checkType){
+            double safetyMultiplier, serviceMultiplier;
+            if(checkType == 0){
+                safetyMultiplier = 0.4;
+                serviceMultiplier = 0.6;
+            }
+            else{
+                safetyMultiplier = 0.6;
+                serviceMultiplier = 0.4;
+            }
+            return (getSafetyRawGrade() * safetyMultiplier) + (getServiceRawGrade() * serviceMultiplier);
+        }
+
+        private static void updateGradeTexts(){
+
+            DecimalFormat df = new DecimalFormat("0.00");
+
+            int checkedId = checkType.getCheckedRadioButtonId();
+            int index = checkType.indexOfChild(checkType.findViewById(checkedId));
+
+            double percent = getGrade(index);
+            double converted = percent * 100;
+
+
+            finalGradeText.setText(df.format(converted) + "%");
+
+            double safetyConverted = getServiceRawGrade() * 100;
+
+            safetyRawText.setText(df.format(safetyConverted) + "%");
+
+            double serviceConverted = getSafetyRawGrade() * 100;
+            serviceRawText.setText(df.format(serviceConverted) + "%");
+
+        }
         /**
          * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
          * one of the sections/tabs/pages.
