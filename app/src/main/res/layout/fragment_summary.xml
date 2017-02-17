@@ -120,8 +120,8 @@
     <TextView
         android:id="@+id/finalGradeText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.3"
+        android:layout_height="0dp"
+        android:layout_weight="0.2"
         android:text="0"
         android:textAlignment="center"
         android:textSize="40sp"/>
@@ -184,6 +184,14 @@
             android:textAlignment="center"/>
 
     </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:padding="8dp"
+        android:text="Submit"
+        android:onClick="submit"/>
 
 
 

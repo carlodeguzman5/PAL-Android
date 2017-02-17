@@ -1,8 +1,12 @@
     package org.evaluation.pal.palcrewevaluation;
+    import android.Manifest;
     import android.content.Context;
+    import android.content.pm.PackageManager;
     import android.graphics.Color;
     import android.support.design.widget.AppBarLayout;
+    import android.support.v4.app.ActivityCompat;
     import android.support.v4.app.FragmentActivity;
+    import android.support.v4.content.ContextCompat;
     import android.support.v7.app.AppCompatActivity;
     import android.support.v7.widget.Toolbar;
     import android.support.v4.app.Fragment;
@@ -31,6 +35,7 @@
     import android.widget.Toast;
 
     import com.github.gcacace.signaturepad.views.SignaturePad;
+    import com.itextpdf.text.DocumentException;
 
     import org.w3c.dom.Text;
 
@@ -53,17 +58,23 @@
          */
         private SectionsPagerAdapter mSectionsPagerAdapter;
         private ViewPager mViewPager;
+        private PDFGenerator pdfGenerator;
         private static List<View> layoutList;
         private static Map<String, Integer> scoreList;
         private static Map<String, Integer> maxScoreList;
         private static Map<String, String> scoreCategoryMapping;
         private static int safetyScore, serviceScore, totalQuestionsCount;
         private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel, safetyMaxScoreText, serviceMaxScoreText, finalGradeText, safetyRawText, serviceRawText;
+        private static Spinner aircraftSpinner, empStatusSpinner;
         private static SignaturePad empSignaturePad, raterSignaturePad;
+
 
         /*Employee Details*/
         private static EditText employeeName, idNumber, date, acRegistry, flightNum, sector, sla, raterName;
         private static RadioGroup checkType;
+
+        private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL = 1;
+        private final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL = 1;
 
         private static boolean debug = false;
 
@@ -183,14 +194,14 @@
                     case 1:
                         rootView = inflater.inflate(R.layout.fragment_evaluation_1, container, false);
 
-                        Spinner empStatusSpinner = (Spinner) rootView.findViewById(R.id.empStatusSpinner);
+                        empStatusSpinner = (Spinner) rootView.findViewById(R.id.empStatusSpinner);
                         ArrayAdapter<String> empStatusSpinnerAdapter;
                         List<String> empStatusSpinnerList = Arrays.asList(getResources().getStringArray(R.array.employee_status));
                         empStatusSpinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, empStatusSpinnerList);
                         empStatusSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         empStatusSpinner.setAdapter(empStatusSpinnerAdapter);
 
-                        Spinner aircraftSpinner = (Spinner) rootView.findViewById(R.id.aircraftSpinner);
+                        aircraftSpinner = (Spinner) rootView.findViewById(R.id.aircraftSpinner);
                         ArrayAdapter<String> aircraftSpinnerAdapter;
                         List<String> aircraftSpinnerList = Arrays.asList(getResources().getStringArray(R.array.aircraft_codes));
                         aircraftSpinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, aircraftSpinnerList);
@@ -584,6 +595,99 @@
             serviceRawText.setText(df.format(serviceConverted) + "%");
 
         }
+
+        public void submit(View view){ //TODO: Move request permissions to methods
+            // Here, thisActivity is the current activity
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                    return;
+
+                } else {
+
+                    // No explanation needed, we can request the permission.
+
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                }
+            }
+
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    return;
+
+                } else {
+
+                    // No explanation needed, we can request the permission.
+
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                }
+            }
+
+            pdfGenerator = new PDFGenerator();
+
+//            ArrayList<String[]> test = new ArrayList<>();
+//            test.add(new String[]{"One", "Two", "Three"});
+//            test.add(new String[]{"One", "Two", "Three"});
+//            test.add(new String[]{"One", "Two", "Three"});
+//            test.add(new String[]{"One", "Two", "Three"});
+//            test.add(new String[]{"One", "Two", "Three"});
+
+            try {
+                createInformationTable();
+
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        @Override
+        public void onRequestPermissionsResult(int requestCode,
+                                               String permissions[], int[] grantResults) {
+            switch (requestCode) {
+                case MY_PERMISSIONS_REQUEST_READ_EXTERNAL: {
+                    // If request is cancelled, the result arrays are empty.
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                        // permission was granted, yay! Do the
+                        // contacts-related task you need to do.
+
+                    } else {
+
+                        // permission denied, boo! Disable the
+                        // functionality that depends on this permission.
+                    }
+                    return;
+                }
+
+                // other 'case' lines to check for other
+                // permissions this app might request
+            }
+        }
+
         /**
          * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
          * one of the sections/tabs/pages.
@@ -611,4 +715,16 @@
                 return "Page " + position;
             }
         }
+
+
+        /*PDF Generation Methods*/
+
+        public void createInformationTable() throws DocumentException{
+            ArrayList<String[]> rows = new ArrayList<>();
+            rows.add(new String[]{employeeName.getText().toString(), idNumber.getText().toString(), empStatusSpinner.getSelectedItem().toString() });
+
+            pdfGenerator.addImage();
+            pdfGenerator.createTable(3, rows);
+        }
+
     }
