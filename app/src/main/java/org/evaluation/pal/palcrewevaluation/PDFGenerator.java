@@ -1,5 +1,8 @@
 package org.evaluation.pal.palcrewevaluation;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 
 import com.itextpdf.text.Anchor;
@@ -19,15 +22,20 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Section;
+import com.itextpdf.text.Utilities;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.codec.Base64;
+import com.itextpdf.text.pdf.collection.PdfTargetDictionary;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -84,6 +92,14 @@ public class PDFGenerator {
         document.addCreator("PAL App");
     }
 
+    public void openDocument(){
+        document.open();
+    }
+
+    public void closeDocument(){
+        document.close();
+    }
+
 
     public void createTable(int columnCount, ArrayList<String[]> rows) throws DocumentException {
         PdfPTable table = new PdfPTable(columnCount);
@@ -96,72 +112,98 @@ public class PDFGenerator {
             }
         }
 
-        document.open();
         document.add(table);
-        document.close();
-
     }
 
-    public void addImage(){
+    public void createInformationTable(Image image, String name, String id, String employmentStatus, String acRegistry, String flightNumber, String sector, String rater, String sla, String checkType) throws DocumentException {
+        PdfPTable table = new PdfPTable(10);
+        table.setTotalWidth(Utilities.millimetersToPoints(200));
+        table.setLockedWidth(true);
+        table.getDefaultCell().setBorder(PdfPCell.NO_BORDER);
 
-        try {
-            Image i = Image.getInstance(String.valueOf(R.drawable.ic_menu_gallery));
-            Chunk c = new Chunk(i, 0, -24);
-            document.open();
-            document.add(c);
-            document.close();
+        table.addCell(getCell(4, 30, Element.ALIGN_BOTTOM, image));
+        table.addCell(getCell(6, 30, Element.ALIGN_CENTER,"Cabin Crew Inflight Performance Evaluation" , ""));
 
-        } catch (IOException | DocumentException e) {
-            e.printStackTrace();
+        table.addCell(getCell(3, 20, Element.ALIGN_LEFT, "Name:", name));
+        table.addCell(getCell(2, 20, Element.ALIGN_LEFT, "ID Number:", id));
+        table.addCell(getCell(5, 20, Element.ALIGN_LEFT, "Employment Status:", employmentStatus));
+
+        table.addCell(getCell(5, 10, Element.ALIGN_LEFT, "AC Number:", ""));
+        table.addCell(getCell(5, 10, Element.ALIGN_LEFT, "Date:", ""));
+
+        table.addCell(getCell(5, 10, Element.ALIGN_LEFT, "AC Registry:", acRegistry));
+        table.addCell(getCell(2, 10, Element.ALIGN_LEFT, "Flight Number:", flightNumber));
+        table.addCell(getCell(3, 10, Element.ALIGN_LEFT, "Sector:", sector));
+
+
+        table.addCell(getCell(7, 10, Element.ALIGN_LEFT, "Rater:", rater));
+        table.addCell(getCell(3, 10, Element.ALIGN_LEFT, "SLA:", sla));
+
+        table.addCell(getCell(10, 10, Element.ALIGN_LEFT, "Type of Check:", checkType));
+
+        document.add(table);
+    }
+
+    public void createTableForDimension(String title, ArrayList<String[]> rows) throws DocumentException {
+        PdfPTable table = new PdfPTable(rows.size());
+
+        table.addCell(new Phrase(title));
+        table.completeRow();
+
+        for (String [] s : rows){
+            for (String value : s) {
+                table.addCell(value);
+            }
+            table.completeRow();
+        }
+        document.add(table);
+    }
+
+
+    private PdfPCell getCell(int cm, int height, int alignment, String label, String text) {
+        PdfPCell cell = new PdfPCell();
+        cell.setColspan(cm);
+        cell.setUseAscender(true);
+        cell.setUseDescender(true);
+        Paragraph p = new Paragraph(
+                String.format("%s", label),
+                new Font(Font.FontFamily.HELVETICA, 8));
+
+        p.add(" " + text);
+
+        p.setAlignment(alignment);
+//        Paragraph p2 = new Paragraph(
+//                String.format("%s", text),
+//                new Font(Font.FontFamily.HELVETICA, 8));
+//        p2.setAlignment(Element.ALIGN_BOTTOM);
+
+
+
+        cell.addElement(p);
+        //cell.addElement(p2);
+        cell.setFixedHeight(height);
+        return cell;
+    }
+
+    private PdfPCell getCell(int cm, int height, int alignment, Image i){
+        PdfPCell cell = new PdfPCell(i, true);
+        cell.setColspan(cm);
+        cell.setUseAscender(true);
+        cell.setUseDescender(true);
+        cell.setFixedHeight(height);
+        return cell;
+    }
+
+    public void addImage(Image image){
+
+        if (image != null){
+            try {
+                document.add(image);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
         }
     }
-
-
-
-    private static void addContent(Document document) throws DocumentException {
-        Anchor anchor = new Anchor("First Chapter", catFont);
-        anchor.setName("First Chapter");
-
-        // Second parameter is the number of the chapter
-        Chapter catPart = new Chapter(new Paragraph(anchor), 1);
-
-        Paragraph subPara = new Paragraph("Subcategory 1", subFont);
-        Section subCatPart = catPart.addSection(subPara);
-        subCatPart.add(new Paragraph("Hello"));
-
-        subPara = new Paragraph("Subcategory 2", subFont);
-        subCatPart = catPart.addSection(subPara);
-        subCatPart.add(new Paragraph("Paragraph 1"));
-        subCatPart.add(new Paragraph("Paragraph 2"));
-        subCatPart.add(new Paragraph("Paragraph 3"));
-
-        // add a list
-        createList(subCatPart);
-        Paragraph paragraph = new Paragraph();
-        addEmptyLine(paragraph, 5);
-        subCatPart.add(paragraph);
-
-        // add a table
-        createTable(subCatPart);
-
-        // now add all this to the document
-        document.add(catPart);
-
-        // Next section
-        anchor = new Anchor("Second Chapter", catFont);
-        anchor.setName("Second Chapter");
-
-        // Second parameter is the number of the chapter
-        catPart = new Chapter(new Paragraph(anchor), 1);
-
-        subPara = new Paragraph("Subcategory", subFont);
-        subCatPart = catPart.addSection(subPara);
-        subCatPart.add(new Paragraph("This is a very important message"));
-
-        // now add all this to the document
-        document.add(catPart);
-    }
-
 
     private static void createTable(Section subCatPart)
     throws BadElementException {
@@ -193,7 +235,6 @@ public class PDFGenerator {
         table.addCell("2.3");
 
         subCatPart.add(table);
-
     }
 
     private static void createList(Section subCatPart) {
@@ -204,10 +245,9 @@ public class PDFGenerator {
         subCatPart.add(list);
     }
 
-    private static void addEmptyLine(Paragraph paragraph, int number) {
+    private static void addEmptyLine(int number) throws DocumentException {
         for (int i = 0; i < number; i++) {
-            paragraph.add(new Paragraph(" "));
+            document.add(new Paragraph(" "));
         }
     }
-
 }

@@ -2,6 +2,8 @@
     import android.Manifest;
     import android.content.Context;
     import android.content.pm.PackageManager;
+    import android.graphics.Bitmap;
+    import android.graphics.BitmapFactory;
     import android.graphics.Color;
     import android.support.design.widget.AppBarLayout;
     import android.support.v4.app.ActivityCompat;
@@ -35,10 +37,15 @@
     import android.widget.Toast;
 
     import com.github.gcacace.signaturepad.views.SignaturePad;
+    import com.itextpdf.text.BadElementException;
     import com.itextpdf.text.DocumentException;
+    import com.itextpdf.text.Image;
 
     import org.w3c.dom.Text;
 
+    import java.io.ByteArrayOutputStream;
+    import java.io.IOException;
+    import java.io.InputStream;
     import java.text.DecimalFormat;
     import java.util.ArrayList;
     import java.util.Arrays;
@@ -647,6 +654,8 @@
 
             pdfGenerator = new PDFGenerator();
 
+
+
 //            ArrayList<String[]> test = new ArrayList<>();
 //            test.add(new String[]{"One", "Two", "Three"});
 //            test.add(new String[]{"One", "Two", "Three"});
@@ -654,12 +663,54 @@
 //            test.add(new String[]{"One", "Two", "Three"});
 //            test.add(new String[]{"One", "Two", "Three"});
 
+            Image header = null;
+
             try {
-                createInformationTable();
+                InputStream inputStream = EvaluationActivity.this.getAssets().open("logo.png");
+                Bitmap bmp = BitmapFactory.decodeStream(inputStream);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+                header = Image.getInstance(stream.toByteArray());
+                header.scalePercent(45f);
+
+            } catch (IOException | BadElementException e) {
+                e.printStackTrace();
+            }
+
+            //ArrayList<String[]> rows = new ArrayList<>();
+            //rows.add(new String[]{employeeName.getText().toString(), idNumber.getText().toString(), empStatusSpinner.getSelectedItem().toString() });
+
+            int checkedId = checkType.getCheckedRadioButtonId();
+            int index = checkType.indexOfChild(checkType.findViewById(checkedId));
+            String checkTypeText = "";
+
+            switch (index){
+                case 0:
+                    checkTypeText = "Competency";
+                    break;
+                case 1:
+                    checkTypeText = "Proficiency";
+                    break;
+            }
+
+            ArrayList<String[]> rows = new ArrayList<>();
+            rows.add(new String[]{"1. Testing", "3", "2"});
+
+
+            pdfGenerator.openDocument();
+
+            try {
+                pdfGenerator.createInformationTable(header, employeeName.getText().toString(), idNumber.getText().toString(), empStatusSpinner.getSelectedItem().toString(), acRegistry.getText().toString(), flightNum.getText().toString(), sector.getText().toString(), raterName.getText().toString(), sla.getText().toString(), checkTypeText);
+                //pdfGenerator.createTable(20, );
+                pdfGenerator.createTableForDimension("Testing Dimension", rows);
+
 
             } catch (DocumentException e) {
                 e.printStackTrace();
             }
+
+            pdfGenerator.closeDocument();
 
         }
 
@@ -719,12 +770,31 @@
 
         /*PDF Generation Methods*/
 
-        public void createInformationTable() throws DocumentException{
-            ArrayList<String[]> rows = new ArrayList<>();
-            rows.add(new String[]{employeeName.getText().toString(), idNumber.getText().toString(), empStatusSpinner.getSelectedItem().toString() });
+        public void createInformationTable() throws DocumentException {
 
-            pdfGenerator.addImage();
-            pdfGenerator.createTable(3, rows);
+
+
+            //ArrayList<String[]> rows = new ArrayList<>();
+            //rows.add(new String[]{employeeName.getText().toString(), idNumber.getText().toString(), empStatusSpinner.getSelectedItem().toString() });
+
+
+            //pdfGenerator.createTable(3, rows);
+
+//            Image header = null;
+//
+//            try {
+//                InputStream inputStream = EvaluationActivity.this.getAssets().open("header.png");
+//                Bitmap bmp = BitmapFactory.decodeStream(inputStream);
+//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//
+//                header = Image.getInstance(stream.toByteArray());
+//                header.scalePercent(45f);
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            pdfGenerator.addImage(header);
         }
-
     }
