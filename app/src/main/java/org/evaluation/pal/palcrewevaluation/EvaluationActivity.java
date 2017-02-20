@@ -70,6 +70,7 @@
         private static Map<String, Integer> scoreList;
         private static Map<String, Integer> maxScoreList;
         private static Map<String, String> scoreCategoryMapping;
+        private static List<Integer> pages;
         private static int safetyScore, serviceScore, totalQuestionsCount;
         private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel, safetyMaxScoreText, serviceMaxScoreText, finalGradeText, safetyRawText, serviceRawText;
         private static Spinner aircraftSpinner, empStatusSpinner;
@@ -138,7 +139,7 @@
             private static final String ARG_SECTION_NUMBER = "section_number";
 
             private static List<String> dimensions;
-            private static List<Integer> pages;
+            //private static List<Integer> pages;
             //private static TextView serviceScoreText, safetyScoreText;
 
             public PlaceholderFragment() {
@@ -685,6 +686,23 @@
             int index = checkType.indexOfChild(checkType.findViewById(checkedId));
             String checkTypeText = "";
 
+            List<String> dimensions = Arrays.asList(getResources().getStringArray(R.array.dimensions));
+            Map<String, ArrayList<String[]>> masterList = new HashMap<>();
+
+            /*Initialize Masterlist*/
+
+            for (String value : dimensions) { //Iterate through dimensions
+                List<String> rowNames = Arrays.asList(getResources().getStringArray(pages.get(dimensions.indexOf(value)))); //List of row labels
+
+                ArrayList<String[]> list = new ArrayList<>();
+                for (String s : rowNames) { //Iterate through rows per dimension
+                    list.add(new String[]{s.split("\\|")[0], String.valueOf(scoreList.get(rowNames.get(rowNames.indexOf(s)).split("\\|")[0]))});
+                }
+
+                masterList.put(value, list);
+            }
+            /*End Initialization*/
+
             switch (index){
                 case 0:
                     checkTypeText = "Competency";
@@ -693,9 +711,9 @@
                     checkTypeText = "Proficiency";
                     break;
             }
-
-            ArrayList<String[]> rows = new ArrayList<>();
-            rows.add(new String[]{"1. Testing", "3", "2"});
+//
+//            ArrayList<String[]> rows = new ArrayList<>();
+//            rows.add(new String[]{"1. Testing", "3", "2"});
 
 
             pdfGenerator.openDocument();
@@ -703,7 +721,12 @@
             try {
                 pdfGenerator.createInformationTable(header, employeeName.getText().toString(), idNumber.getText().toString(), empStatusSpinner.getSelectedItem().toString(), acRegistry.getText().toString(), flightNum.getText().toString(), sector.getText().toString(), raterName.getText().toString(), sla.getText().toString(), checkTypeText);
                 //pdfGenerator.createTable(20, );
-                pdfGenerator.createTableForDimension("Testing Dimension", rows);
+
+                for (String value : dimensions){
+                    pdfGenerator.addEmptyLine(1);
+
+                    pdfGenerator.createTableForDimension(value, masterList.get(value));
+                }
 
 
             } catch (DocumentException e) {
@@ -765,36 +788,5 @@
             public CharSequence getPageTitle(int position) {
                 return "Page " + position;
             }
-        }
-
-
-        /*PDF Generation Methods*/
-
-        public void createInformationTable() throws DocumentException {
-
-
-
-            //ArrayList<String[]> rows = new ArrayList<>();
-            //rows.add(new String[]{employeeName.getText().toString(), idNumber.getText().toString(), empStatusSpinner.getSelectedItem().toString() });
-
-
-            //pdfGenerator.createTable(3, rows);
-
-//            Image header = null;
-//
-//            try {
-//                InputStream inputStream = EvaluationActivity.this.getAssets().open("header.png");
-//                Bitmap bmp = BitmapFactory.decodeStream(inputStream);
-//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-//
-//                header = Image.getInstance(stream.toByteArray());
-//                header.scalePercent(45f);
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            pdfGenerator.addImage(header);
         }
     }

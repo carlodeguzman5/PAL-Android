@@ -145,9 +145,12 @@ public class PDFGenerator {
     }
 
     public void createTableForDimension(String title, ArrayList<String[]> rows) throws DocumentException {
-        PdfPTable table = new PdfPTable(rows.size());
+        PdfPTable table = new PdfPTable(rows.get(0).length);
+        table.setWidthPercentage(80);
 
-        table.addCell(new Phrase(title));
+        PdfPCell titleCell = new PdfPCell(new Phrase(title));
+        titleCell.setBorder(PdfPCell.NO_BORDER);
+        table.addCell(titleCell);
         table.completeRow();
 
         for (String [] s : rows){
@@ -165,6 +168,7 @@ public class PDFGenerator {
         cell.setColspan(cm);
         cell.setUseAscender(true);
         cell.setUseDescender(true);
+        cell.setFixedHeight(20);
         Paragraph p = new Paragraph(
                 String.format("%s", label),
                 new Font(Font.FontFamily.HELVETICA, 8));
@@ -245,7 +249,7 @@ public class PDFGenerator {
         subCatPart.add(list);
     }
 
-    private static void addEmptyLine(int number) throws DocumentException {
+    public static void addEmptyLine(int number) throws DocumentException {
         for (int i = 0; i < number; i++) {
             document.add(new Paragraph(" "));
         }
