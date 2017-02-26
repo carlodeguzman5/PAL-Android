@@ -1,13 +1,10 @@
     package org.evaluation.pal.palcrewevaluation;
     import android.Manifest;
-    import android.content.Context;
     import android.content.pm.PackageManager;
     import android.graphics.Bitmap;
     import android.graphics.BitmapFactory;
-    import android.graphics.Color;
     import android.support.design.widget.AppBarLayout;
     import android.support.v4.app.ActivityCompat;
-    import android.support.v4.app.FragmentActivity;
     import android.support.v4.content.ContextCompat;
     import android.support.v7.app.AppCompatActivity;
     import android.support.v7.widget.Toolbar;
@@ -18,7 +15,6 @@
     import android.os.Bundle;
     import android.text.Editable;
     import android.text.TextWatcher;
-    import android.view.Gravity;
     import android.view.LayoutInflater;
     import android.view.Menu;
     import android.view.MenuItem;
@@ -26,23 +22,13 @@
     import android.view.ViewGroup;
     import android.widget.ArrayAdapter;
     import android.widget.EditText;
-    import android.widget.LinearLayout;
-    import android.widget.RadioButton;
     import android.widget.RadioGroup;
-    import android.widget.RelativeLayout;
-    import android.widget.ScrollView;
     import android.widget.Spinner;
-    import android.widget.TextClock;
     import android.widget.TextView;
-    import android.widget.Toast;
-
     import com.github.gcacace.signaturepad.views.SignaturePad;
     import com.itextpdf.text.BadElementException;
     import com.itextpdf.text.DocumentException;
     import com.itextpdf.text.Image;
-
-    import org.w3c.dom.Text;
-
     import java.io.ByteArrayOutputStream;
     import java.io.IOException;
     import java.io.InputStream;
@@ -67,6 +53,7 @@
         private ViewPager mViewPager;
         private PDFGenerator pdfGenerator;
         private static List<View> layoutList;
+        private static List<Dimension> dimensions;
         private static Map<String, Integer> scoreList;
         private static Map<String, Integer> maxScoreList;
         private static Map<String, String> scoreCategoryMapping;
@@ -138,7 +125,7 @@
              */
             private static final String ARG_SECTION_NUMBER = "section_number";
 
-            private static List<String> dimensions;
+            private static List<String> dimensionStrings;
             //private static List<Integer> pages;
             //private static TextView serviceScoreText, safetyScoreText;
 
@@ -171,24 +158,55 @@
                 pages.add(R.array.evaluation_page_10);
                 pages.add(R.array.evaluation_page_11);
                 pages.add(R.array.evaluation_page_12);
+            }
 
+            private List<Row> convertToRowList(List<String> list){
+                List<Row> rowList = new ArrayList<>();
+                for(String s : list) {
+                    String[] temp = s.split("\\|");
+                    String name = temp[0].trim();
+                    String aspectType = temp[1].trim();
+                    int maxScore = 1;
+
+                    if(temp.length >= 3){
+                        maxScore = 3;
+                    }
+
+                    if(aspectType.equalsIgnoreCase("Header")){
+                        rowList.add(new SectionHeader(name));
+                    }
+                    else if (aspectType.equalsIgnoreCase("Text")) {
+                        rowList.add(new Aspect(name, maxScore, AspectType.TEXT, Category.Service)); //Hardcoded
+                    }
+                    else {
+                        rowList.add(new Aspect(name, maxScore, AspectType.DEFAULT, (aspectType.equalsIgnoreCase("Safety") ? Category.Safety : Category.Service)));
+                    }
+                }
+                return rowList;
             }
 
             @Override
             public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                      Bundle savedInstanceState) {
 
+                /* Extraction of data from strings.xml into objects */
                 initPages();
-                dimensions = Arrays.asList(getResources().getStringArray(R.array.dimensions));
+                dimensionStrings = Arrays.asList(getResources().getStringArray(R.array.dimensions));
+                dimensions = new ArrayList<>();
+                for(int i = 0; i < dimensionStrings.size(); i++) { // Iterate per dimension
+                    Dimension thisDimension = new Dimension(dimensionStrings.get(i));
+                    List<String> pageRows = Arrays.asList(getResources().getStringArray(pages.get(i)));
+                    thisDimension.setRowList(convertToRowList(pageRows));
+                    dimensions.add(thisDimension);
+                }
 
                 layoutList = new ArrayList<>();
                 scoreList = new HashMap<>();
                 maxScoreList = new HashMap<>();
                 scoreCategoryMapping = new HashMap<>();
 
-                for(int i = 0; i < 12; i++){
-                    List<String> pageRows = Arrays.asList(getResources().getStringArray(pages.get(i)));
-                    layoutList.add(generateView(pageRows, getActivity(), dimensions.get(i)));
+                for(Dimension dimension : dimensions){ // Get layouts from each dimension
+                    layoutList.add(dimension.getViewPage(getActivity()));
                 }
 
                 int mFragmentIndex = 0;
@@ -234,9 +252,6 @@
                                 }
                             });
                         }
-
-
-
 
                         employeeName.addTextChangedListener(new TextWatcher() {
                             @Override
@@ -341,170 +356,24 @@
             }
         }
 
-        private static View generateView(List<String> pageElements, FragmentActivity context, String sectionTitle){
-            ScrollView scroller = new ScrollView(context);
-            LinearLayout container = new LinearLayout(context);
-            container.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            container.setOrientation(LinearLayout.VERTICAL);
-            container.setPadding(16, 16, 16, 16);
-
-            scroller.addView(container);
-
-            TextView sectionTextView = new TextView(context);
-            sectionTextView.setText(sectionTitle);
-            sectionTextView.setTextSize(20.0f);
-            container.addView(sectionTextView);
-
-            for (String s : pageElements){
-                //Extract values in s
-                String[] temp = s.split("\\|");
-                String rowLabel, rowType, radioType;
-                rowLabel = temp[0];
-                rowType = temp[1];
-                radioType = "";
-                if(temp.length > 2)
-                    radioType = temp[2];
-
-                LinearLayout rowLayout = new LinearLayout(context);
-                rowLayout.setOrientation(LinearLayout.HORIZONTAL);
-                rowLayout.setPadding(8, 16, 8, 16);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                rowLayout.setLayoutParams(params);
-
-                TextView rowLabelTextView = new TextView(context);
-                RadioGroup rowRadioGroup = new RadioGroup(context);
-
-                if(!rowType.equalsIgnoreCase("Text")) {
-                    rowLabelTextView.setText(rowLabel);
-                    rowLabelTextView.setLeft(0);
-                    rowLayout.addView(rowLabelTextView);
-                }
-                else{
-                    EditText rowEditText = new EditText(context);
-                    rowEditText.setLayoutParams(params);
-                    rowLayout.addView(rowEditText);
-                }
-
-                if (rowType.equals("Header")) {
-                    rowLabelTextView.setTextSize(18);
-                    rowLabelTextView.setTextColor(Color.BLACK);
-                } else {
-                    params.weight = 0.80f;
-                    params.gravity = Gravity.LEFT;
-                    rowLabelTextView.setLayoutParams(params);
-
-                    rowRadioGroup = generateRadioGroup(context, radioType, rowLabel);
-                    //params.weight = 1f;
-                    //params.gravity = Gravity.RIGHT;
-                    //rowRadioGroup.setLayoutParams(params);
-
-                    scoreCategoryMapping.put(rowLabel, rowType);
-
-                }
-
-                rowLayout.addView(rowRadioGroup);
-
-                /*else{
-                    if(!rowLabel.trim().equals("")){
-                        TextView rowLabelTextView = new TextView(context);
-                        rowLabelTextView.setText(rowLabel);
-                        rowLabelTextView.setLeft(0);
-
-
-
-                    }
-                }*/
-
-                container.addView(rowLayout);
-            }
-
-            return scroller;
-        }
-
-        public static class ScoreClickListener implements View.OnClickListener{
-            String rowName;
-            int score, maxScore;
-            Context context;
-            public ScoreClickListener(String rowName, int score, int maxScore, Context context){
-                this.rowName = rowName;
-                this.score = score;
-                this.maxScore = maxScore;
-                this.context = context;
-            }
-
+        public static class RadioButtonClickListener implements View.OnClickListener{
+            RadioButtonClickListener(){}
             @Override
             public void onClick(View v) {
-                scoreList.put(rowName, score);
-                maxScoreList.put(rowName, maxScore);
-                updateServiceScore(context);
-                updateSafetyScore(context);
+                updateScores();
             }
         }
 
-        private static RadioGroup generateRadioGroup(final Context context, String type, final String rowName){
-            RadioGroup rowRadioGroup = new RadioGroup(context);
-
-            rowRadioGroup.setOrientation(RadioGroup.HORIZONTAL);
-            rowRadioGroup.setRight(0);
-
-            if(type.equals("01")){
-                RadioButton zeroButton = new RadioButton(context);
-                zeroButton.setText("0");
-                zeroButton.setOnClickListener(new ScoreClickListener(rowName, 0, 1, context));
-
-                RadioButton oneButton = new RadioButton(context);
-                oneButton.setText("1");
-                oneButton.setOnClickListener(new ScoreClickListener(rowName, 1, 1, context));
-
-                rowRadioGroup.addView(zeroButton);
-                rowRadioGroup.addView(oneButton);
-            }
-            else if(type.equals("0123")){
-                RadioButton zeroButton = new RadioButton(context);
-                zeroButton.setText("0");
-                zeroButton.setOnClickListener(new ScoreClickListener(rowName, 0, 3, context));
-
-                RadioButton oneButton = new RadioButton(context);
-                oneButton.setText("1");
-                oneButton.setOnClickListener(new ScoreClickListener(rowName, 1, 3, context));
-
-                RadioButton twoButton = new RadioButton(context);
-                twoButton.setText("2");
-                twoButton.setOnClickListener(new ScoreClickListener(rowName, 2, 3, context));
-
-                RadioButton threeButton = new RadioButton(context);
-                threeButton.setText("3");
-                threeButton.setOnClickListener(new ScoreClickListener(rowName, 3, 3, context));
-
-                rowRadioGroup.addView(zeroButton);
-                rowRadioGroup.addView(oneButton);
-                rowRadioGroup.addView(twoButton);
-                rowRadioGroup.addView(threeButton);
-            }
-            else{
-                RadioButton oButton = new RadioButton(context);
-                oButton.setText("O");
-                oButton.setOnClickListener(new ScoreClickListener(rowName, 1, 1, context));
-
-                RadioButton bButton = new RadioButton(context);
-                bButton.setText("B");
-                bButton.setOnClickListener(new ScoreClickListener(rowName, 0, 1, context));
-
-                RadioButton naButton = new RadioButton(context);
-                naButton.setText("N/A");
-                naButton.setOnClickListener(new ScoreClickListener(rowName, 0, 0, context));
-
-                rowRadioGroup.addView(oButton);
-                rowRadioGroup.addView(bButton);
-                rowRadioGroup.addView(naButton);
+        private static void updateScores(){
+            for(Dimension dimension : dimensions){
+                //scoreList.put(dimension.getDimensionName(), dimension.getSc)
             }
 
-            totalQuestionsCount++;
-            return rowRadioGroup;
+            //scoreList.put()
+
         }
 
-        private static void updateServiceScore(Context context){
+        private static void updateServiceScore(){
             int score = 0;
             int maxScore = 0;
             for(Map.Entry<String, Integer> entry :  scoreList.entrySet()){
@@ -525,11 +394,11 @@
             updateGradeTexts();
 
 
-            if(debug)
-                Toast.makeText(context, String.valueOf(score), Toast.LENGTH_SHORT).show();
+//            if(debug)
+//                Toast.makeText(context, String.valueOf(score), Toast.LENGTH_SHORT).show();
         }
 
-        private static void updateSafetyScore (Context context){
+        private static void updateSafetyScore (){
             int score = 0;
             int maxScore = 0;
             for(Map.Entry<String, Integer> entry :  scoreList.entrySet()){
@@ -551,8 +420,8 @@
 
             updateGradeTexts();
 
-            if(debug)
-                Toast.makeText(context, String.valueOf(score), Toast.LENGTH_LONG).show();
+//            if(debug)
+//                Toast.makeText(context, String.valueOf(score), Toast.LENGTH_LONG).show();
         }
 
         private static double getSafetyRawGrade(){
@@ -696,7 +565,8 @@
 
                 ArrayList<String[]> list = new ArrayList<>();
                 for (String s : rowNames) { //Iterate through rows per dimension
-                    list.add(new String[]{s.split("\\|")[0], String.valueOf(scoreList.get(rowNames.get(rowNames.indexOf(s)).split("\\|")[0]))});
+                    if(!s.split("\\|")[1].equals("Header"))
+                        list.add(new String[]{s.split("\\|")[0], String.valueOf(scoreList.get(rowNames.get(rowNames.indexOf(s)).split("\\|")[0]))});
                 }
 
                 masterList.put(value, list);
@@ -727,6 +597,7 @@
 
                     pdfGenerator.createTableForDimension(value, masterList.get(value));
                 }
+                pdfGenerator.createGradeSummary(checkTypeText, "", "");
 
 
             } catch (DocumentException e) {

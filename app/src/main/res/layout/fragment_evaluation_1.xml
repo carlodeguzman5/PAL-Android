@@ -175,6 +175,12 @@
             android:layout_height="wrap_content"
             android:id="@+id/raterText"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Type of Check:"
+            android:id="@+id/checkLabel"/>
+
         <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -199,11 +205,7 @@
 
         </RadioGroup>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Type of Check:"
-            android:id="@+id/checkLabel"/>
+
 
     </LinearLayout>
 </ScrollView>

@@ -43,6 +43,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 /**
  * Created by carlo on 2/17/2017.
  */
@@ -146,7 +148,7 @@ public class PDFGenerator {
 
     public void createTableForDimension(String title, ArrayList<String[]> rows) throws DocumentException {
         PdfPTable table = new PdfPTable(rows.get(0).length);
-        table.setWidthPercentage(80);
+        table.setWidthPercentage(90);
 
         PdfPCell titleCell = new PdfPCell(new Phrase(title));
         titleCell.setBorder(PdfPCell.NO_BORDER);
@@ -160,6 +162,11 @@ public class PDFGenerator {
             table.completeRow();
         }
         document.add(table);
+    }
+
+    public void createGradeSummary(String checkType, String safetyRating, String serviceRating) throws DocumentException{
+        Rectangle rect = new Rectangle(100,100,100,100);
+        document.add(rect);
     }
 
 
