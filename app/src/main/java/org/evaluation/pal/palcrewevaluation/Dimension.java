@@ -13,6 +13,8 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.itextpdf.text.pdf.parser.Line;
+
 import java.util.List;
 
 /**
@@ -80,13 +82,11 @@ public class Dimension {
 
     public int getScoreByCategory(Category category){
         int score = 0;
-        if (category == Category.Safety) {
-            for(Row row : rowList){
-                if(row.getClass() == Aspect.class){
-                    Aspect aspect = (Aspect) row;
-                    if(aspect.getCategory() == category){
-                        score += aspect.getScore();
-                    }
+        for(Row row : rowList){
+            if(row.getClass() == Aspect.class){
+                Aspect aspect = (Aspect) row;
+                if(aspect.getCategory() == category){
+                    score += aspect.getScore();
                 }
             }
         }
@@ -110,7 +110,7 @@ public class Dimension {
 
     /* Layout Generation Methods */
 
-    public View getViewPage(FragmentActivity context){
+    public View getViewPage(FragmentActivity context, EvaluationActivity.PlaceholderFragment caller){
 
         ScrollView scroller = new ScrollView(context);
         LinearLayout container = new LinearLayout(context);
@@ -161,7 +161,11 @@ public class Dimension {
                 params.gravity = Gravity.START;
                 rowLabelTextView.setLayoutParams(params);
 
-                rowRadioGroup = generateRadioGroup(context, radioType, rowLabel);
+                try {
+                    rowRadioGroup = aspect.generateRadioGroup(context, radioType);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 //params.weight = 1f;
                 //params.gravity = Gravity.RIGHT;
                 //rowRadioGroup.setLayoutParams(params);
@@ -183,66 +187,43 @@ public class Dimension {
         return scroller;
     }
 
-    private static RadioGroup generateRadioGroup(final Context context, RadioType radioType, final String rowName){
-        RadioGroup rowRadioGroup = new RadioGroup(context);
+    public View getSummaryRow(FragmentActivity context){
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                0.5f
+        );
+        LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                0.25f
+        );
 
-        rowRadioGroup.setOrientation(RadioGroup.HORIZONTAL);
-        rowRadioGroup.setRight(0);
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setWeightSum(1);
 
-        if(radioType == RadioType.ONE){
-            RadioButton zeroButton = new RadioButton(context);
-            zeroButton.setText("0");
-            zeroButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
+        TextView dimensionNameText = new TextView(context);
+        dimensionNameText.setText(this.dimensionName);
+        dimensionNameText.setLayoutParams(param);
 
-            RadioButton oneButton = new RadioButton(context);
-            oneButton.setText("1");
-            oneButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
+        TextView serviceScoreText = new TextView(context);
+        serviceScoreText.setText(String.valueOf(getScoreByCategory(Category.Service)));
+        serviceScoreText.setLayoutParams(param2);
 
-            rowRadioGroup.addView(zeroButton);
-            rowRadioGroup.addView(oneButton);
-        }
-        else if(radioType == RadioType.THREE){
-            RadioButton zeroButton = new RadioButton(context);
-            zeroButton.setText("0");
-            zeroButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
+        TextView safetyScoreText = new TextView(context);
+        safetyScoreText.setText(String.valueOf(getScoreByCategory(Category.Safety)));
+        safetyScoreText.setLayoutParams(param2);
 
-            RadioButton oneButton = new RadioButton(context);
-            oneButton.setText("1");
-            oneButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
+        row.addView(dimensionNameText);
+        row.addView(serviceScoreText);
+        row.addView(safetyScoreText);
 
-            RadioButton twoButton = new RadioButton(context);
-            twoButton.setText("2");
-            twoButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
-
-            RadioButton threeButton = new RadioButton(context);
-            threeButton.setText("3");
-            threeButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
-
-            rowRadioGroup.addView(zeroButton);
-            rowRadioGroup.addView(oneButton);
-            rowRadioGroup.addView(twoButton);
-            rowRadioGroup.addView(threeButton);
-        }
-        else{
-            RadioButton oButton = new RadioButton(context);
-            oButton.setText("O");
-            oButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
-
-            RadioButton bButton = new RadioButton(context);
-            bButton.setText("B");
-            bButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
-
-            RadioButton naButton = new RadioButton(context);
-            naButton.setText("N/A");
-            naButton.setOnClickListener(new EvaluationActivity.RadioButtonClickListener());
-
-            rowRadioGroup.addView(naButton);
-            rowRadioGroup.addView(bButton);
-            rowRadioGroup.addView(oButton);
-        }
-
-        return rowRadioGroup;
+        return row;
     }
+
+
+
 
 
 

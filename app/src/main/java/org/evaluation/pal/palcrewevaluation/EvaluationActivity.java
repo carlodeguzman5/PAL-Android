@@ -1,10 +1,12 @@
     package org.evaluation.pal.palcrewevaluation;
     import android.Manifest;
+    import android.app.Activity;
     import android.content.pm.PackageManager;
     import android.graphics.Bitmap;
     import android.graphics.BitmapFactory;
     import android.support.design.widget.AppBarLayout;
     import android.support.v4.app.ActivityCompat;
+    import android.support.v4.app.FragmentActivity;
     import android.support.v4.content.ContextCompat;
     import android.support.v7.app.AppCompatActivity;
     import android.support.v7.widget.Toolbar;
@@ -22,6 +24,7 @@
     import android.view.ViewGroup;
     import android.widget.ArrayAdapter;
     import android.widget.EditText;
+    import android.widget.LinearLayout;
     import android.widget.RadioGroup;
     import android.widget.Spinner;
     import android.widget.TextView;
@@ -29,6 +32,8 @@
     import com.itextpdf.text.BadElementException;
     import com.itextpdf.text.DocumentException;
     import com.itextpdf.text.Image;
+    import com.itextpdf.text.pdf.parser.Line;
+
     import java.io.ByteArrayOutputStream;
     import java.io.IOException;
     import java.io.InputStream;
@@ -60,6 +65,7 @@
         private static List<Integer> pages;
         private static int safetyScore, serviceScore, totalQuestionsCount;
         private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel, safetyMaxScoreText, serviceMaxScoreText, finalGradeText, safetyRawText, serviceRawText;
+        private static LinearLayout gradeBreakdownLayout;
         private static Spinner aircraftSpinner, empStatusSpinner;
         private static SignaturePad empSignaturePad, raterSignaturePad;
 
@@ -126,8 +132,6 @@
             private static final String ARG_SECTION_NUMBER = "section_number";
 
             private static List<String> dimensionStrings;
-            //private static List<Integer> pages;
-            //private static TextView serviceScoreText, safetyScoreText;
 
             public PlaceholderFragment() {
             }
@@ -206,7 +210,7 @@
                 scoreCategoryMapping = new HashMap<>();
 
                 for(Dimension dimension : dimensions){ // Get layouts from each dimension
-                    layoutList.add(dimension.getViewPage(getActivity()));
+                    layoutList.add(dimension.getViewPage(getActivity(), this));
                 }
 
                 int mFragmentIndex = 0;
@@ -269,7 +273,6 @@
 
                             }
                         });
-
                         raterName.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -327,49 +330,37 @@
                     case 14:
                         rootView = inflater.inflate(R.layout.fragment_summary, container, false);
 
-                        serviceScoreText = (TextView) rootView.findViewById(R.id.serviceScore);
-                        safetyScoreText = (TextView) rootView.findViewById(R.id.safetyScore);
-                        serviceMaxScoreText = (TextView) rootView.findViewById(R.id.serviceScoreHPS);
-                        safetyMaxScoreText = (TextView) rootView.findViewById(R.id.safetyScoreHPS);
-
-                        serviceRawText = (TextView) rootView.findViewById(R.id.rawServiceGradeText);
-                        safetyRawText = (TextView) rootView.findViewById(R.id.rawSafetyGradeText);
-                        finalGradeText = (TextView) rootView.findViewById(R.id.finalGradeText);
+//                        serviceScoreText = (TextView) rootView.findViewById(R.id.serviceScore);
+//                        safetyScoreText = (TextView) rootView.findViewById(R.id.safetyScore);
+//                        serviceMaxScoreText = (TextView) rootView.findViewById(R.id.serviceScoreHPS);
+//                        safetyMaxScoreText = (TextView) rootView.findViewById(R.id.safetyScoreHPS);
+//
+//                        serviceRawText = (TextView) rootView.findViewById(R.id.rawServiceGradeText);
+//                        safetyRawText = (TextView) rootView.findViewById(R.id.rawSafetyGradeText);
+//                        finalGradeText = (TextView) rootView.findViewById(R.id.finalGradeText);
 
                         empNameLabel = (TextView) rootView.findViewById(R.id.employeeNameLabel);
                         raterNameLabel = (TextView) rootView.findViewById(R.id.raterNameLabel);
                         empSignaturePad = (SignaturePad) rootView.findViewById(R.id.signature_pad_1);
                         raterSignaturePad = (SignaturePad) rootView.findViewById(R.id.signature_pad_2);
 
-                        serviceScoreText.setText("0");
-                        safetyScoreText.setText("0");
-                        serviceMaxScoreText.setText("0");
-                        safetyMaxScoreText.setText("0");
+                        gradeBreakdownLayout = (LinearLayout) rootView.findViewById(R.id.GradeBreakdownLayout);
+                        //gradeBreakdownLayout.addView(getSummaryView(getActivity(), dimensions));
 
-                        serviceRawText.setText("0%");
-                        safetyRawText.setText("0%");
-                        finalGradeText.setText("0%");
+//                        serviceScoreText.setText("0");
+//                        safetyScoreText.setText("0");
+//                        serviceMaxScoreText.setText("0");
+//                        safetyMaxScoreText.setText("0");
+//
+//                        serviceRawText.setText("0%");
+//                        safetyRawText.setText("0%");
+//                        finalGradeText.setText("0%");
 
                         break;
                 }
                 return rootView;
             }
-        }
 
-        public static class RadioButtonClickListener implements View.OnClickListener{
-            RadioButtonClickListener(){}
-            @Override
-            public void onClick(View v) {
-                updateScores();
-            }
-        }
-
-        private static void updateScores(){
-            for(Dimension dimension : dimensions){
-                //scoreList.put(dimension.getDimensionName(), dimension.getSc)
-            }
-
-            //scoreList.put()
 
         }
 
@@ -471,6 +462,28 @@
             double serviceConverted = getSafetyRawGrade() * 100;
             serviceRawText.setText(df.format(serviceConverted) + "%");
 
+        }
+
+        private static LinearLayout getSummaryView(FragmentActivity context, List<Dimension> dimensions) {
+            gradeBreakdownLayout.removeAllViews();
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            LinearLayout layout = new LinearLayout(context);
+            layout.setOrientation(LinearLayout.VERTICAL);
+            layout.setLayoutParams(params);
+
+            for(Dimension dimension : dimensions){
+                layout.addView(dimension.getSummaryRow(context));
+            }
+
+            return layout;
+        }
+
+        public void updateScores(View view){
+            gradeBreakdownLayout.removeAllViews();
+            gradeBreakdownLayout.addView(getSummaryView((FragmentActivity) view.getContext(), dimensions));
         }
 
         public void submit(View view){ //TODO: Move request permissions to methods
