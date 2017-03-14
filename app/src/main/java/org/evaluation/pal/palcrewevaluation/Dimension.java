@@ -80,7 +80,7 @@ public class Dimension {
         return maxScore;
     }
 
-    public int getScoreByCategory(Category category){
+    public String getScoreByCategory(Category category){
         int score = 0;
         for(Row row : rowList){
             if(row.getClass() == Aspect.class){
@@ -90,7 +90,7 @@ public class Dimension {
                 }
             }
         }
-        return score;
+        return String.valueOf(score);
     }
 
     public int getMaxScoreByCategory(Category category){
@@ -222,7 +222,24 @@ public class Dimension {
         return row;
     }
 
+    public Aspect getAspectByName(String aspectName) {
+        for (Row row : rowList) {
+            if(row.getRowName().equalsIgnoreCase(aspectName)){
+                Aspect aspect = (Aspect) row;
+                return aspect;
+            }
+        }
+        return null;
+    }
 
+    public boolean hasAspect(String aspectName) {
+        for(Row row : rowList) {
+            if(row.getRowName().equalsIgnoreCase(aspectName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 

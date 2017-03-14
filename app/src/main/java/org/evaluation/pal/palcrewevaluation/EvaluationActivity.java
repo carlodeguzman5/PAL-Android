@@ -1,12 +1,10 @@
     package org.evaluation.pal.palcrewevaluation;
     import android.Manifest;
-    import android.app.Activity;
     import android.content.pm.PackageManager;
     import android.graphics.Bitmap;
     import android.graphics.BitmapFactory;
     import android.support.design.widget.AppBarLayout;
     import android.support.v4.app.ActivityCompat;
-    import android.support.v4.app.FragmentActivity;
     import android.support.v4.content.ContextCompat;
     import android.support.v7.app.AppCompatActivity;
     import android.support.v7.widget.Toolbar;
@@ -32,7 +30,6 @@
     import com.itextpdf.text.BadElementException;
     import com.itextpdf.text.DocumentException;
     import com.itextpdf.text.Image;
-    import com.itextpdf.text.pdf.parser.Line;
 
     import java.io.ByteArrayOutputStream;
     import java.io.IOException;
@@ -43,6 +40,8 @@
     import java.util.HashMap;
     import java.util.List;
     import java.util.Map;
+
+    import static org.evaluation.pal.palcrewevaluation.EvaluationActivity.PlaceholderFragment.updateFragmentScores;
 
     public class EvaluationActivity extends AppCompatActivity {
 
@@ -63,12 +62,25 @@
         private static Map<String, Integer> maxScoreList;
         private static Map<String, String> scoreCategoryMapping;
         private static List<Integer> pages;
-        private static int safetyScore, serviceScore, totalQuestionsCount;
+        private static int safetyScore, serviceScore;
         private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel, safetyMaxScoreText, serviceMaxScoreText, finalGradeText, safetyRawText, serviceRawText;
-        private static LinearLayout gradeBreakdownLayout;
+        private static List<TextView> dimensionSafetyScoreTextViews;
+        private static List<TextView> dimensionServiceScoreTextViews;
+
         private static Spinner aircraftSpinner, empStatusSpinner;
         private static SignaturePad empSignaturePad, raterSignaturePad;
-
+        private static TextView
+                dimension1Safety, dimension1Service,
+                dimension2Safety, dimension2Service,
+                dimension3Safety, dimension3Service,
+                dimension4Safety, dimension4Service,
+                dimension5Safety, dimension5Service,
+                dimension6Safety, dimension6Service,
+                dimension7Safety, dimension7Service,
+                dimension8Safety, dimension8Service,
+                dimension9Safety, dimension9Service,
+                dimension10Safety, dimension10Service,
+                dimension11Safety, dimension11Service;
 
         /*Employee Details*/
         private static EditText employeeName, idNumber, date, acRegistry, flightNum, sector, sla, raterName;
@@ -208,6 +220,8 @@
                 scoreList = new HashMap<>();
                 maxScoreList = new HashMap<>();
                 scoreCategoryMapping = new HashMap<>();
+                dimensionSafetyScoreTextViews = new ArrayList<>();
+                dimensionServiceScoreTextViews = new ArrayList<>();
 
                 for(Dimension dimension : dimensions){ // Get layouts from each dimension
                     layoutList.add(dimension.getViewPage(getActivity(), this));
@@ -344,8 +358,33 @@
                         empSignaturePad = (SignaturePad) rootView.findViewById(R.id.signature_pad_1);
                         raterSignaturePad = (SignaturePad) rootView.findViewById(R.id.signature_pad_2);
 
-                        gradeBreakdownLayout = (LinearLayout) rootView.findViewById(R.id.GradeBreakdownLayout);
+                        //gradeBreakdownLayout = (LinearLayout) rootView.findViewById(R.id.GradeBreakdownLayout);
                         //gradeBreakdownLayout.addView(getSummaryView(getActivity(), dimensions));
+
+
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore1));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore2));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore3));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore4));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore5));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore6));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore7));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore8));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore9));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore10));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore11));
+
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore1));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore2));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore3));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore4));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore5));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore6));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore7));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore8));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore9));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore10));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore11));
 
 //                        serviceScoreText.setText("0");
 //                        safetyScoreText.setText("0");
@@ -361,7 +400,20 @@
                 return rootView;
             }
 
+            public static void updateFragmentScores(){
+                for(TextView textView : dimensionServiceScoreTextViews) {
+                    Dimension dimension = dimensions.get(dimensionServiceScoreTextViews.indexOf(textView));
+                    textView.setText(dimension.getScoreByCategory(Category.Service));
+                }
+                for(TextView textView : dimensionSafetyScoreTextViews) {
+                    Dimension dimension = dimensions.get(dimensionSafetyScoreTextViews.indexOf(textView));
+                    textView.setText(dimension.getScoreByCategory(Category.Safety));
+                }
+            }
+        }
 
+        public void updateScores(View view) {
+            updateFragmentScores();
         }
 
         private static void updateServiceScore(){
@@ -464,7 +516,16 @@
 
         }
 
-        private static LinearLayout getSummaryView(FragmentActivity context, List<Dimension> dimensions) {
+        private static Dimension getDimensionByName(String name){
+            for(Dimension dimension : dimensions) {
+                if(name.equalsIgnoreCase(dimension.getDimensionName())){
+                    return dimension;
+                }
+            }
+            return null;
+        }
+
+       /* private static LinearLayout getSummaryView(FragmentActivity context, List<Dimension> dimensions) {
             gradeBreakdownLayout.removeAllViews();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -479,14 +540,10 @@
             }
 
             return layout;
-        }
+        }*/
 
-        public void updateScores(View view){
-            gradeBreakdownLayout.removeAllViews();
-            gradeBreakdownLayout.addView(getSummaryView((FragmentActivity) view.getContext(), dimensions));
-        }
-
-        public void submit(View view){ //TODO: Move request permissions to methods
+        public void submit(View view){
+            //TODO: Move request permissions to methods
             // Here, thisActivity is the current activity
             if (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -671,6 +728,28 @@
             @Override
             public CharSequence getPageTitle(int position) {
                 return "Page " + position;
+            }
+        }
+
+        static class RadioButtonClickListener implements View.OnClickListener{
+            int score;
+            String rowName;
+            public RadioButtonClickListener(String rowName, int score) throws Exception {
+                this.score = score;
+                this.rowName = rowName;
+            }
+            @Override
+            public void onClick(View v) {
+                for(Dimension dimension : dimensions) {
+                    if (dimension.hasAspect(rowName)) {
+                        try {
+                            dimension.getAspectByName(rowName).setScore(score);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+//                updateScores();
             }
         }
     }
