@@ -85,7 +85,7 @@ public class Dimension {
         for(Row row : rowList){
             if(row.getClass() == Aspect.class){
                 Aspect aspect = (Aspect) row;
-                if(aspect.getCategory() == category){
+                if(aspect.isAnswered() && aspect.getCategory() == category){
                     score += aspect.getScore();
                 }
             }
@@ -95,13 +95,11 @@ public class Dimension {
 
     public int getMaxScoreByCategory(Category category){
         int maxScore = 0;
-        if (category == Category.Safety) {
-            for(Row row : rowList){
-                if(row.getClass() == Aspect.class){
-                    Aspect aspect = (Aspect) row;
-                    if(aspect.getCategory() == category){
-                        maxScore += aspect.getMaxScore();
-                    }
+        for(Row row : rowList){
+            if(row.getClass() == Aspect.class){
+                Aspect aspect = (Aspect) row;
+                if(aspect.getCategory() == category && aspect.isAnswered()){
+                    maxScore += aspect.getMaxScore();
                 }
             }
         }

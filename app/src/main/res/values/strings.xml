@@ -239,11 +239,12 @@
     <string name="dimension4">Aircraft Boarding</string>
     <string name="dimension5">Passenger Boarding</string>
     <string name="dimension6">Doors Closed</string>
-    <string name="dimension7">Before Landing Duties</string>
-    <string name="dimension8">After Landing Duties</string>
-    <string name="dimension9">Personal Effectiveness</string>
-    <string name="dimension10">Safety Knowledge</string>
-    <string name="dimension11">Service Knowledge</string>
+    <string name="dimension7">After Take Off Duties</string>
+    <string name="dimension8">Before Landing Duties</string>
+    <string name="dimension9">After Landing Duties</string>
+    <string name="dimension10">Personal Effectiveness</string>
+    <string name="dimension11">Safety Knowledge</string>
+    <string name="dimension12">Service Knowledge</string>
 
     <string name="title_activity_evaluation">Inflight Performance Evaluation</string>
 

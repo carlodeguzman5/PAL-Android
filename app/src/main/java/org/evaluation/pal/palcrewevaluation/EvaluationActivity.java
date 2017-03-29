@@ -62,25 +62,13 @@
         private static Map<String, Integer> maxScoreList;
         private static Map<String, String> scoreCategoryMapping;
         private static List<Integer> pages;
-        private static int safetyScore, serviceScore;
+        private static double safetyScore, serviceScore, safetyMaxScore, serviceMaxScore;
         private static TextView safetyScoreText, serviceScoreText, raterNameLabel, empNameLabel, safetyMaxScoreText, serviceMaxScoreText, finalGradeText, safetyRawText, serviceRawText;
         private static List<TextView> dimensionSafetyScoreTextViews;
         private static List<TextView> dimensionServiceScoreTextViews;
 
         private static Spinner aircraftSpinner, empStatusSpinner;
         private static SignaturePad empSignaturePad, raterSignaturePad;
-        private static TextView
-                dimension1Safety, dimension1Service,
-                dimension2Safety, dimension2Service,
-                dimension3Safety, dimension3Service,
-                dimension4Safety, dimension4Service,
-                dimension5Safety, dimension5Service,
-                dimension6Safety, dimension6Service,
-                dimension7Safety, dimension7Service,
-                dimension8Safety, dimension8Service,
-                dimension9Safety, dimension9Service,
-                dimension10Safety, dimension10Service,
-                dimension11Safety, dimension11Service;
 
         /*Employee Details*/
         private static EditText employeeName, idNumber, date, acRegistry, flightNum, sector, sla, raterName;
@@ -181,21 +169,21 @@
                 for(String s : list) {
                     String[] temp = s.split("\\|");
                     String name = temp[0].trim();
-                    String aspectType = temp[1].trim();
+                    String category = temp[1].trim();
                     int maxScore = 1;
 
                     if(temp.length >= 3){
                         maxScore = 3;
                     }
 
-                    if(aspectType.equalsIgnoreCase("Header")){
+                    if(category.equalsIgnoreCase("Header")){
                         rowList.add(new SectionHeader(name));
                     }
-                    else if (aspectType.equalsIgnoreCase("Text")) {
+                    else if (category.equalsIgnoreCase("Text")) {
                         rowList.add(new Aspect(name, maxScore, AspectType.TEXT, Category.Service)); //Hardcoded
                     }
                     else {
-                        rowList.add(new Aspect(name, maxScore, AspectType.DEFAULT, (aspectType.equalsIgnoreCase("Safety") ? Category.Safety : Category.Service)));
+                        rowList.add(new Aspect(name, maxScore, AspectType.DEFAULT, (category.equalsIgnoreCase("Safety") ? Category.Safety : Category.Service)));
                     }
                 }
                 return rowList;
@@ -344,14 +332,14 @@
                     case 14:
                         rootView = inflater.inflate(R.layout.fragment_summary, container, false);
 
-//                        serviceScoreText = (TextView) rootView.findViewById(R.id.serviceScore);
-//                        safetyScoreText = (TextView) rootView.findViewById(R.id.safetyScore);
+                        //serviceScoreText = (TextView) rootView.findViewById(R.id.serviceScore);
+                        //safetyScoreText = (TextView) rootView.findViewById(R.id.safetyScore);
 //                        serviceMaxScoreText = (TextView) rootView.findViewById(R.id.serviceScoreHPS);
 //                        safetyMaxScoreText = (TextView) rootView.findViewById(R.id.safetyScoreHPS);
-//
-//                        serviceRawText = (TextView) rootView.findViewById(R.id.rawServiceGradeText);
-//                        safetyRawText = (TextView) rootView.findViewById(R.id.rawSafetyGradeText);
-//                        finalGradeText = (TextView) rootView.findViewById(R.id.finalGradeText);
+
+                        serviceScoreText = (TextView) rootView.findViewById(R.id.rawServiceGradeText);
+                        safetyScoreText = (TextView) rootView.findViewById(R.id.rawSafetyGradeText);
+                        finalGradeText = (TextView) rootView.findViewById(R.id.finalGradeText);
 
                         empNameLabel = (TextView) rootView.findViewById(R.id.employeeNameLabel);
                         raterNameLabel = (TextView) rootView.findViewById(R.id.raterNameLabel);
@@ -373,6 +361,7 @@
                         dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore9));
                         dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore10));
                         dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore11));
+                        dimensionSafetyScoreTextViews.add((TextView) rootView.findViewById(R.id.safetyScore12));
 
                         dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore1));
                         dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore2));
@@ -385,6 +374,7 @@
                         dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore9));
                         dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore10));
                         dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore11));
+                        dimensionServiceScoreTextViews.add((TextView) rootView.findViewById(R.id.serviceScore12));
 
 //                        serviceScoreText.setText("0");
 //                        safetyScoreText.setText("0");
@@ -414,71 +404,46 @@
 
         public void updateScores(View view) {
             updateFragmentScores();
+            updateCategoryScore(Category.Safety);
+            updateCategoryScore(Category.Service);
         }
 
-        private static void updateServiceScore(){
+        private static void updateCategoryScore(Category category){
             int score = 0;
             int maxScore = 0;
-            for(Map.Entry<String, Integer> entry :  scoreList.entrySet()){
-                String category = scoreCategoryMapping.get(entry.getKey());
-                if(category.trim().equalsIgnoreCase("Service") || category.trim().equalsIgnoreCase("Text"))
-                    score += entry.getValue();
-            }
-            serviceScore = score;
-            serviceScoreText.setText(String.valueOf(serviceScore));
 
-
-            for(Map.Entry<String, Integer> entry :  maxScoreList.entrySet()){
-                String category = scoreCategoryMapping.get(entry.getKey());
-                if(category.trim().equalsIgnoreCase("Service") || category.trim().equalsIgnoreCase("Text"))
-                    maxScore += entry.getValue();
+            for(Dimension dimension : dimensions) {
+                score += Integer.parseInt(dimension.getScoreByCategory(category));
+                maxScore += dimension.getMaxScoreByCategory(category);
             }
-            serviceMaxScoreText.setText(String.valueOf(maxScore));
+
+            if(category == Category.Service) {
+                serviceScore = score;
+                serviceMaxScore = maxScore;
+                serviceScoreText.setText(String.valueOf(score));
+            }
+            else if(category == Category.Safety) {
+                safetyScore = score;
+                safetyMaxScore = maxScore;
+                safetyScoreText.setText(String.valueOf(score));
+            }
+
+            //serviceMaxScoreText.setText(String.valueOf(maxScore));
             updateGradeTexts();
-
-
-//            if(debug)
-//                Toast.makeText(context, String.valueOf(score), Toast.LENGTH_SHORT).show();
-        }
-
-        private static void updateSafetyScore (){
-            int score = 0;
-            int maxScore = 0;
-            for(Map.Entry<String, Integer> entry :  scoreList.entrySet()){
-                String category = scoreCategoryMapping.get(entry.getKey());
-                if(category.trim().equalsIgnoreCase("Safety"))
-                    score += entry.getValue();
-            }
-
-            safetyScore = score;
-            safetyScoreText.setText(String.valueOf(safetyScore));
-
-            for(Map.Entry<String, Integer> entry :  maxScoreList.entrySet()){
-                String category = scoreCategoryMapping.get(entry.getKey());
-                if(category.trim().equalsIgnoreCase("Safety"))
-                    maxScore += entry.getValue();
-            }
-
-            safetyMaxScoreText.setText(String.valueOf(maxScore));
-
-            updateGradeTexts();
-
-//            if(debug)
-//                Toast.makeText(context, String.valueOf(score), Toast.LENGTH_LONG).show();
         }
 
         private static double getSafetyRawGrade(){
-            if (Double.parseDouble(safetyMaxScoreText.getText().toString()) == 0)
+            if (safetyMaxScore == 0)
                 return 0;
 
-            return safetyScore / Double.parseDouble(safetyMaxScoreText.getText().toString());
+            return safetyScore / safetyMaxScore;
         }
 
         private static double getServiceRawGrade(){
-            if (Double.parseDouble(serviceMaxScoreText.getText().toString()) == 0)
+            if (serviceMaxScore == 0)
                 return 0;
 
-            return serviceScore / Double.parseDouble(serviceMaxScoreText.getText().toString());
+            return serviceScore / serviceMaxScore;
         }
 
         private static double getGrade(int checkType){
@@ -509,10 +474,10 @@
 
             double safetyConverted = getServiceRawGrade() * 100;
 
-            safetyRawText.setText(df.format(safetyConverted) + "%");
+            safetyScoreText.setText(df.format(safetyConverted) + "%");
 
             double serviceConverted = getSafetyRawGrade() * 100;
-            serviceRawText.setText(df.format(serviceConverted) + "%");
+            serviceScoreText.setText(df.format(serviceConverted) + "%");
 
         }
 

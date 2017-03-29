@@ -31,8 +31,10 @@ public class Aspect extends Row{
     }
     /*Used by UI whenever user interacts with the radio buttons*/
     public void setScore(int score) throws Exception {
-        if(score <= maxScore)
+        if(score <= maxScore) {
             this.score = score;
+            this.isAnswered = true;
+        }
         else
             throw new Exception("Invalid Score: score cannot be greater than maxScore.");
     }
@@ -51,6 +53,10 @@ public class Aspect extends Row{
 
     public Category getCategory(){
         return category;
+    }
+
+    public void setCategory (Category category) {
+        this.category = category;
     }
 
     public RadioGroup generateRadioGroup(FragmentActivity context, RadioType radioType) throws Exception {
