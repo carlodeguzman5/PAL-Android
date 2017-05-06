@@ -146,18 +146,20 @@ public class PDFGenerator {
         document.add(table);
     }
 
-    public void createTableForDimension(String title, ArrayList<String[]> rows) throws DocumentException {
-        PdfPTable table = new PdfPTable(rows.get(0).length);
+    public void createTableForDimension(Dimension dimension) throws DocumentException {
+        PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(90);
 
-        PdfPCell titleCell = new PdfPCell(new Phrase(title));
+        PdfPCell titleCell = new PdfPCell(new Phrase(dimension.getDimensionName()));
         titleCell.setBorder(PdfPCell.NO_BORDER);
         table.addCell(titleCell);
-        table.completeRow();
+        table.completeRow(); 
 
-        for (String [] s : rows){
-            for (String value : s) {
-                table.addCell(value);
+        for (Row row : dimension.getRowList()) {
+            if(row.getClass() == Aspect.class){
+                Aspect a = (Aspect) row;
+                table.addCell(a.getRowName());
+                table.addCell(String.valueOf(a.getScore()));
             }
             table.completeRow();
         }
