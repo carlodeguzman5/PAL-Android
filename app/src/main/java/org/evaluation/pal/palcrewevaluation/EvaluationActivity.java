@@ -1,5 +1,6 @@
     package org.evaluation.pal.palcrewevaluation;
     import android.Manifest;
+    import android.content.Intent;
     import android.content.pm.PackageManager;
     import android.graphics.Bitmap;
     import android.graphics.BitmapFactory;
@@ -15,6 +16,7 @@
     import android.os.Bundle;
     import android.text.Editable;
     import android.text.TextWatcher;
+    import android.util.Log;
     import android.view.LayoutInflater;
     import android.view.Menu;
     import android.view.MenuItem;
@@ -40,6 +42,11 @@
     import java.util.HashMap;
     import java.util.List;
     import java.util.Map;
+
+    import com.microsoft.aad.adal.AuthenticationCallback;
+    import com.microsoft.aad.adal.AuthenticationContext;
+    import com.microsoft.aad.adal.AuthenticationResult;
+    import com.microsoft.aad.adal.PromptBehavior;
 
     import static org.evaluation.pal.palcrewevaluation.EvaluationActivity.PlaceholderFragment.updateFragmentScores;
 
@@ -78,6 +85,15 @@
         private final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL = 1;
 
         private static boolean debug = false;
+
+        /* Configurations */
+
+        public final static String CLIENT_ID = "83b39bc6-45b6-40cc-8343-1e0658ee95aa"; //This is your client ID
+        public final static String REDIRECT_URI = "https://login.microsoftonline.com/common/oauth2/v2.0/nativeclient"; //This is your redirect URI
+        public final static String AUTHORITY_URL = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";  //COMMON OR YOUR TENANT ID
+        private final static String AUTH_TAG = "auth"; // Search "auth" in your Android Monitor to see errors
+
+        private AuthenticationContext mAuthContext;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -629,8 +645,7 @@
 
                 for (String value : dimensions){
                     pdfGenerator.addEmptyLine(1);
-
-                    pdfGenerator.createTableForDimension(value, masterList.get(value));
+                    pdfGenerator.createTableForDimension(getDimensionByName(value));
                 }
                 pdfGenerator.createGradeSummary(checkTypeText, "", "");
 
@@ -640,6 +655,8 @@
             }
 
             pdfGenerator.closeDocument();
+
+            signIn();
 
         }
 
@@ -666,6 +683,69 @@
                 // other 'case' lines to check for other
                 // permissions this app might request
             }
+        }
+
+        public void signIn ()
+        {
+            mAuthContext = new AuthenticationContext(EvaluationActivity.this, AUTHORITY_URL, true);
+
+            mAuthContext.acquireToken(
+                    EvaluationActivity.this,
+                    CLIENT_ID,
+                    CLIENT_ID,
+                    REDIRECT_URI,
+                    PromptBehavior.Auto,
+                    new AuthenticationCallback<AuthenticationResult>()
+                    {
+
+                        @Override
+                        public void onError(Exception e)
+                        {
+                            Log.e(AUTH_TAG, "Error getting token: " + e.toString());
+                        }
+
+                        @Override
+                        public void onSuccess(AuthenticationResult result)
+                        {
+                            Log.v(AUTH_TAG, "Successfully obtained token, still need to validate");
+                            if (result != null && !result.getAccessToken().isEmpty())
+                            {
+                                try
+                                {
+                                    String firstName = result.getUserInfo().getGivenName();
+                                    String lastName = result.getUserInfo().getFamilyName();
+                                    //updateLoggedInUI(firstName, lastName);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.e(AUTH_TAG, "Exception Generated, Unable to hit the backend: " + e.toString());
+                                }
+                            }
+                            else
+                            {
+                                Log.e(AUTH_TAG, "Error: token came back empty");
+                            }
+                        }
+                    });
+        }
+
+//        private void updateLoggedInUI(String firstName, String lastName)
+//        {
+//    /* Hide the sign in button */
+//            findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
+//
+//    /* Show the welcome message */
+//            TextView signedIn = (TextView) findViewById(R.id.welcomeSignedIn);
+//            signedIn.setVisibility(View.VISIBLE);
+//            signedIn.setText("Welcome " + firstName + " " + lastName);
+//        }
+
+
+        @Override
+        protected void onActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            super.onActivityResult(requestCode, resultCode, data);
+            mAuthContext.onActivityResult(requestCode, resultCode, data);
         }
 
         /**
