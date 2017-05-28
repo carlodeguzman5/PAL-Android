@@ -1,22 +1,23 @@
     package org.evaluation.pal.palcrewevaluation;
+
     import android.Manifest;
+    import android.app.ProgressDialog;
     import android.content.Intent;
     import android.content.pm.PackageManager;
     import android.graphics.Bitmap;
     import android.graphics.BitmapFactory;
+    import android.os.Bundle;
     import android.support.design.widget.AppBarLayout;
     import android.support.v4.app.ActivityCompat;
-    import android.support.v4.content.ContextCompat;
-    import android.support.v7.app.AppCompatActivity;
-    import android.support.v7.widget.Toolbar;
     import android.support.v4.app.Fragment;
     import android.support.v4.app.FragmentManager;
     import android.support.v4.app.FragmentPagerAdapter;
+    import android.support.v4.content.ContextCompat;
     import android.support.v4.view.ViewPager;
-    import android.os.Bundle;
+    import android.support.v7.app.AppCompatActivity;
+    import android.support.v7.widget.Toolbar;
     import android.text.Editable;
     import android.text.TextWatcher;
-    import android.util.Log;
     import android.view.LayoutInflater;
     import android.view.Menu;
     import android.view.MenuItem;
@@ -24,18 +25,30 @@
     import android.view.ViewGroup;
     import android.widget.ArrayAdapter;
     import android.widget.EditText;
-    import android.widget.LinearLayout;
     import android.widget.RadioGroup;
     import android.widget.Spinner;
     import android.widget.TextView;
+
     import com.github.gcacace.signaturepad.views.SignaturePad;
+    import com.google.common.util.concurrent.SettableFuture;
     import com.itextpdf.text.BadElementException;
     import com.itextpdf.text.DocumentException;
     import com.itextpdf.text.Image;
+    import com.microsoft.aad.adal.AuthenticationCallback;
+    import com.microsoft.aad.adal.AuthenticationContext;
+    import com.microsoft.aad.adal.AuthenticationResult;
+    import com.microsoft.aad.adal.PromptBehavior;
+    import com.microsoft.services.orc.auth.AuthenticationCredentials;
+    import com.microsoft.services.orc.core.DependencyResolver;
+    import com.microsoft.services.orc.http.Credentials;
+    import com.microsoft.services.orc.http.impl.OAuthCredentials;
+    import com.microsoft.services.orc.http.impl.OkHttpTransport;
+    import com.microsoft.services.orc.serialization.impl.GsonSerializer;
 
     import java.io.ByteArrayOutputStream;
     import java.io.IOException;
     import java.io.InputStream;
+    import java.security.NoSuchAlgorithmException;
     import java.text.DecimalFormat;
     import java.util.ArrayList;
     import java.util.Arrays;
@@ -43,11 +56,9 @@
     import java.util.List;
     import java.util.Map;
 
-    import com.microsoft.aad.adal.AuthenticationCallback;
-    import com.microsoft.aad.adal.AuthenticationContext;
-    import com.microsoft.aad.adal.AuthenticationResult;
-    import com.microsoft.aad.adal.PromptBehavior;
+    import javax.crypto.NoSuchPaddingException;
 
+    import static com.microsoft.aad.adal.AuthenticationResult.AuthenticationStatus;
     import static org.evaluation.pal.palcrewevaluation.EvaluationActivity.PlaceholderFragment.updateFragmentScores;
 
     public class EvaluationActivity extends AppCompatActivity {
@@ -88,12 +99,11 @@
 
         /* Configurations */
 
-        public final static String CLIENT_ID = "83b39bc6-45b6-40cc-8343-1e0658ee95aa"; //This is your client ID
-        public final static String REDIRECT_URI = "https://login.microsoftonline.com/common/oauth2/v2.0/nativeclient"; //This is your redirect URI
-        public final static String AUTHORITY_URL = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";  //COMMON OR YOUR TENANT ID
-        private final static String AUTH_TAG = "auth"; // Search "auth" in your Android Monitor to see errors
-
         private AuthenticationContext mAuthContext;
+        private DependencyResolver mResolver;
+        private TextView messagesTextView;
+        private String[] scopes = new String[]{"http://outlook.office.com/Mail.Send"};
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -523,67 +533,78 @@
             return layout;
         }*/
 
+        public boolean requestPermission(){
+           // Here, thisActivity is the current activity
+           if (ContextCompat.checkSelfPermission(this,
+                   Manifest.permission.READ_EXTERNAL_STORAGE)
+                   != PackageManager.PERMISSION_GRANTED) {
+
+               // Should we show an explanation?
+               if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                       Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                   return true;
+
+               } else {
+
+                   // No explanation needed, we can request the permission.
+                   ActivityCompat.requestPermissions(this,
+                           new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                           MY_PERMISSIONS_REQUEST_READ_EXTERNAL);
+
+                   // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                   // app-defined int constant. The callback method gets the
+                   // result of the request.
+               }
+           }
+
+           if (ContextCompat.checkSelfPermission(this,
+                   Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                   != PackageManager.PERMISSION_GRANTED) {
+
+               // Should we show an explanation?
+               if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                       Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                   return true;
+
+               } else {
+
+                   // No explanation needed, we can request the permission.
+
+                   ActivityCompat.requestPermissions(this,
+                           new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                           MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL);
+
+                   // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                   // app-defined int constant. The callback method gets the
+                   // result of the request.
+               }
+           }
+
+           return false;
+       }
+
         public void submit(View view){
-            //TODO: Move request permissions to methods
-            // Here, thisActivity is the current activity
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
+            ProgressDialog progress = new ProgressDialog(this);
+            progress.setTitle("Loading");
+            progress.setMessage("Generating report...");
+            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            progress.show();
 
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-                    return;
-
-                } else {
-
-                    // No explanation needed, we can request the permission.
-
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL);
-
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
-                }
+            try {
+                createDocument(view);
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+                e.printStackTrace();
             }
 
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
+            progress.dismiss();
+        }
 
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    return;
+        public void createDocument(View view) throws NoSuchAlgorithmException, NoSuchPaddingException {
 
-                } else {
-
-                    // No explanation needed, we can request the permission.
-
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL);
-
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
-                }
-            }
+            if(requestPermission()) return;
 
             pdfGenerator = new PDFGenerator();
-
-
-
-//            ArrayList<String[]> test = new ArrayList<>();
-//            test.add(new String[]{"One", "Two", "Three"});
-//            test.add(new String[]{"One", "Two", "Three"});
-//            test.add(new String[]{"One", "Two", "Three"});
-//            test.add(new String[]{"One", "Two", "Three"});
-//            test.add(new String[]{"One", "Two", "Three"});
-
             Image header = null;
 
             try {
@@ -641,23 +662,25 @@
 
             try {
                 pdfGenerator.createInformationTable(header, employeeName.getText().toString(), idNumber.getText().toString(), empStatusSpinner.getSelectedItem().toString(), acRegistry.getText().toString(), flightNum.getText().toString(), sector.getText().toString(), raterName.getText().toString(), sla.getText().toString(), checkTypeText);
-                //pdfGenerator.createTable(20, );
 
                 for (String value : dimensions){
-                    pdfGenerator.addEmptyLine(1);
+                    PDFGenerator.addEmptyLine(1);
                     pdfGenerator.createTableForDimension(getDimensionByName(value));
                 }
-                pdfGenerator.createGradeSummary(checkTypeText, "", "");
+                PDFGenerator.addEmptyLine(1);
+                pdfGenerator.createGradeSummary(checkTypeText, getSafetyRawGrade(), getServiceRawGrade());
 
 
             } catch (DocumentException e) {
                 e.printStackTrace();
             }
 
+            //pdfGenerator.createGradeSummary();
+
             pdfGenerator.closeDocument();
 
-            signIn();
-
+            //progress.dismiss();
+            //logon();
         }
 
         @Override
@@ -685,48 +708,47 @@
             }
         }
 
-        public void signIn ()
-        {
-            mAuthContext = new AuthenticationContext(EvaluationActivity.this, AUTHORITY_URL, true);
+        protected SettableFuture<Boolean> logon() throws NoSuchPaddingException, NoSuchAlgorithmException {
+            final SettableFuture<Boolean> result = SettableFuture.create();
 
-            mAuthContext.acquireToken(
-                    EvaluationActivity.this,
-                    CLIENT_ID,
-                    CLIENT_ID,
-                    REDIRECT_URI,
-                    PromptBehavior.Auto,
-                    new AuthenticationCallback<AuthenticationResult>()
-                    {
+            try {
+                mAuthContext = new AuthenticationContext(this, getString(R.string.AADAuthority), true);
+                mAuthContext.acquireToken(
+                        this,
+                        scopes,
+                        null,
+                        getString(R.string.AADClientId),
+                        getString(R.string.AADRedirectUrl),
+                        PromptBehavior.Auto,
+                        new AuthenticationCallback<AuthenticationResult>() {
 
-                        @Override
-                        public void onError(Exception e)
-                        {
-                            Log.e(AUTH_TAG, "Error getting token: " + e.toString());
-                        }
-
-                        @Override
-                        public void onSuccess(AuthenticationResult result)
-                        {
-                            Log.v(AUTH_TAG, "Successfully obtained token, still need to validate");
-                            if (result != null && !result.getAccessToken().isEmpty())
-                            {
-                                try
-                                {
-                                    String firstName = result.getUserInfo().getGivenName();
-                                    String lastName = result.getUserInfo().getFamilyName();
-                                    //updateLoggedInUI(firstName, lastName);
-                                }
-                                catch (Exception e)
-                                {
-                                    Log.e(AUTH_TAG, "Exception Generated, Unable to hit the backend: " + e.toString());
+                            @Override
+                            public void onSuccess(final AuthenticationResult authenticationResult) {
+                                if (authenticationResult != null
+                                        && authenticationResult.getStatus() == AuthenticationStatus.Succeeded) {
+                                    mResolver = new DependencyResolver.Builder(
+                                            new OkHttpTransport(), new GsonSerializer(),
+                                            new AuthenticationCredentials() {
+                                                @Override
+                                                public Credentials getCredentials() {
+                                                    return new OAuthCredentials(authenticationResult.getAccessToken());
+                                                }
+                                            }).build();
+                                    result.set(true);
                                 }
                             }
-                            else
-                            {
-                                Log.e(AUTH_TAG, "Error: token came back empty");
+
+                            @Override
+                            public void onError(Exception e) {
+                                result.setException(e);
                             }
-                        }
-                    });
+
+                        });
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+                e.printStackTrace();
+                result.setException(e);
+            }
+            return result;
         }
 
 //        private void updateLoggedInUI(String firstName, String lastName)

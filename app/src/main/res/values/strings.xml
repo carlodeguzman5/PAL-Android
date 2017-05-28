@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">PAL Evaluations</string>
 
+    <string name="AADAuthority">https://login.microsoftonline.com/common</string>
+    <string name="AADResourceId">https://outlook.office.com</string>
+    <string name="AADClientId">Paste your Client ID HERE</string>
+    <string name="AADRedirectUrl">Paste your Redirect URI HERE</string>
+    
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
