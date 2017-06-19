@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -166,9 +167,43 @@ public class PDFGenerator {
         document.add(table);
     }
 
-    public void createGradeSummary(String checkType, String safetyRating, String serviceRating) throws DocumentException{
-        Rectangle rect = new Rectangle(100,100,100,100);
-        document.add(rect);
+    public void createGradeSummary(String checkTypeText, double safetyScore, double serviceScore) throws DocumentException{
+        PdfPTable summary = new PdfPTable(2);
+        summary.setWidthPercentage(25);
+        summary.addCell("Safety");
+        summary.addCell("Service");
+        summary.completeRow();
+
+
+        DecimalFormat df = new DecimalFormat("0.00");
+
+        summary.addCell(String.valueOf(df.format(safetyScore * 100)) + "%");
+        summary.addCell(String.valueOf(df.format(serviceScore * 100)) + "%");
+        document.add(summary);
+
+        PdfPTable finalScore = new PdfPTable(1);
+        finalScore.setWidthPercentage(25);
+
+
+        double safetyMultiplier = 0;
+        double serviceMultiplier = 0;
+
+        switch (checkTypeText){
+            case "Competency":
+                safetyMultiplier = 0.4;
+                serviceMultiplier = 0.6;
+                break;
+            case "Proficiency":
+                safetyMultiplier = 0.6;
+                serviceMultiplier = 0.4;
+                break;
+        }
+
+        double finalGrade =  (safetyMultiplier * 100 * safetyScore) + (serviceMultiplier * 100 * serviceScore);
+
+
+        finalScore.addCell(String.valueOf(df.format(finalGrade)) + "%");
+        document.add(finalScore);
     }
 
 
